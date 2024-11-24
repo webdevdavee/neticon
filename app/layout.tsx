@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Navbar from "@/components/layouts/Navbar";
 
-const electrolize = localFont({
-  src: "/fonts/Electrolize-Regular.ttf",
-  variable: "--font-electrolize",
+const SpaceGrotesk = localFont({
+  src: "/fonts/SpaceGrotesk-VariableFont_wght.ttf",
+  variable: "--font-SpaceGrotesk",
+  weight: "100 200 300 400 500 600 700 800 900",
 });
 
 export const metadata: Metadata = {
@@ -19,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${electrolize.variable}`}>{children}</body>
+      <body className={`${SpaceGrotesk.variable}`}>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
