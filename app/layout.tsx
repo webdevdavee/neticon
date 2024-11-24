@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Navbar from "@/components/layouts/Navbar";
+import Footer from "@/components/layouts/Footer";
 
 const SpaceGrotesk = localFont({
   src: "/fonts/SpaceGrotesk-VariableFont_wght.ttf",
@@ -24,6 +25,7 @@ export default function RootLayout({
       <body className={`${SpaceGrotesk.variable}`}>
         <Navbar />
         <div className="wrapper">{children}</div>
+        <Footer />
       </body>
     </html>
   );
