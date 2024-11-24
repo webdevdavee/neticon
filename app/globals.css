@@ -16,8 +16,11 @@ body {
   background: var(--background);
   font-family: var(--font-SpaceGrotesk);
   min-height: 100vh;
-  padding: 0.6rem 2rem;
   overflow-x: hidden;
+}
+
+.wrapper {
+  padding: 0.6rem 2rem;
 }
 
 h1 {

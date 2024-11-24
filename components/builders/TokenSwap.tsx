@@ -60,13 +60,13 @@ const TokenSwap = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-8 bg-white dark:bg-background_light rounded-xl shadow-lg">
+    <div className="w-full max-w-md h-fit mx-auto p-8 bg-white dark:bg-background_light rounded-xl shadow-lg">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Swap Tokens</h2>
         <button
           onClick={() => setShowSettingsModal(true)}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+          className="p-2 hover:bg-background rounded-full transition-colors"
         >
           <FiSettings className="w-5 h-5" />
         </button>

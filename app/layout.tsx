@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${SpaceGrotesk.variable}`}>
         <Navbar />
-        {children}
+        <div className="wrapper">{children}</div>
       </body>
     </html>
   );
