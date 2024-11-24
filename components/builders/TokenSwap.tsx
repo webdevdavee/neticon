@@ -75,7 +75,7 @@ const TokenSwap = () => {
       {/* From Token */}
       <div className="bg-lighter p-4 rounded-lg mb-2">
         <div className="flex justify-between mb-5">
-          <span className="text-sm text-gray-500">From</span>
+          <span className="text-sm">From</span>
           <div className="space-x-2">
             <Button
               text="50%"
@@ -123,7 +123,7 @@ const TokenSwap = () => {
 
       {/* To Token */}
       <div className="bg-lighter p-4 rounded-lg">
-        <span className="text-sm text-gray-500 mb-2 block">To</span>
+        <span className="text-sm mb-2 block">To</span>
         <div className="flex items-center">
           <TextInput
             label="none"
@@ -160,7 +160,7 @@ const TokenSwap = () => {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              customStyle="w-full px-4 py-2 pl-10 bg-gray-50 dark:bg-gray-800 rounded-lg outline-none"
+              customStyle="w-full px-4 py-2 pl-10 rounded-lg outline-none"
               placeholder="Search by name or paste address"
             />
             <BiSearchAlt2 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -170,14 +170,14 @@ const TokenSwap = () => {
               <button
                 key={token.address}
                 onClick={() => handleTokenSelect(token)}
-                className="w-full flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-background_light rounded-lg transition-colors"
+                className="w-full flex items-center justify-between p-2 hover:bg-background_light rounded-md transition-colors"
               >
                 <span>{token.symbol}</span>
-                <span className="text-gray-500">{token.balance}</span>
+                <span>{token.balance}</span>
               </button>
             ))}
           </div>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm">
             Can&apos;t find the token you&apos;re looking for? Try entering the
             mint address or check token list settings below.
           </p>
@@ -202,19 +202,20 @@ const TokenSwap = () => {
                   onClick={() => setSlippage(value)}
                   className={`px-3 py-1 rounded-lg ${
                     slippage === value
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-200 dark:bg-background_light"
+                      ? "bg-accent text-background"
+                      : "bg-background_light"
                   }`}
                 >
                   {value}%
                 </button>
               ))}
-              <div className="relative flex items-center">
+              <div className="relative flex items-center px-2 py-1 bg-background_light rounded-lg">
+                <p className="mr-3">Enter custom: </p>
                 <input
                   type="number"
                   value={slippage}
                   onChange={(e) => setSlippage(e.target.value)}
-                  className="w-20 px-2 py-1 bg-gray-200 dark:bg-background_light rounded-lg outline-none"
+                  className="w-20 pr-6 bg-background_light outline-none"
                 />
                 <span className="absolute right-2">%</span>
               </div>

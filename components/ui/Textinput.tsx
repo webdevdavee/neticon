@@ -39,7 +39,7 @@ const TextInput: React.FC<TextInputProps> = ({
           <input
             {...inputRegister}
             {...props}
-            className={`w-full placeholder:font-medium bg-transparent placeholder:text-sm text-white focus:outline-none ${
+            className={`w-full placeholder:font-medium bg-transparent placeholder:text-sm focus:outline-none ${
               customStyle || ""
             }`}
             type={type}

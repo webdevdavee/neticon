@@ -35,7 +35,7 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
             transition={{ duration: 0.2 }}
             className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full mx-4 pointer-events-auto">
+            <div className="bg-lighter rounded-lg shadow-xl max-w-md w-full mx-4 pointer-events-auto">
               <div className="flex justify-end p-2">
                 <button
                   onClick={onClose}
