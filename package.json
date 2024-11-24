@@ -1,6 +1,7 @@
 {
   "name": "neticon",
   "version": "0.1.0",
+  "author": "David Okpala",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
