@@ -7,7 +7,9 @@ const Navbar = () => {
     <section className="w-full sticky top-0 z-[45]">
       <div className="relative py-4 px-8 backdrop-blur-md bg-base/70 border-b border-b-lighter">
         <nav className="flex items-center justify-between">
-          <h2>Neticon</h2>
+          <Link href="/" className="text-2xl">
+            Neticon
+          </Link>
           <ul className="flex items-center gap-8">
             <Link href="/swap" className="text-lg">
               Swap

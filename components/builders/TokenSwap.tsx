@@ -60,7 +60,7 @@ const TokenSwap = () => {
   };
 
   return (
-    <div className="w-full max-w-md h-fit mx-auto p-8 bg-white dark:bg-background_light rounded-xl shadow-lg">
+    <div className="w-full max-w-md h-fit mx-auto p-8 bg-background_light rounded-xl shadow-lg">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Swap Tokens</h2>
@@ -79,12 +79,12 @@ const TokenSwap = () => {
           <div className="space-x-2">
             <Button
               text="50%"
-              style="text-sm bg-gray-200 dark:bg-background_light px-2 py-1 rounded-md hover:opacity-80"
+              style="text-sm bg-background_light px-2 py-1 rounded-md hover:opacity-80"
               onclick={handleHalfAmount}
             />
             <Button
               text="Max"
-              style="text-sm bg-gray-200 dark:bg-background_light px-2 py-1 rounded-md hover:opacity-80"
+              style="text-sm bg-background_light px-2 py-1 rounded-md hover:opacity-80"
               onclick={handleMaxAmount}
             />
           </div>
@@ -103,7 +103,7 @@ const TokenSwap = () => {
               setActiveField("from");
               setShowTokenModal(true);
             }}
-            className="flex items-center space-x-2 bg-gray-200 dark:bg-background_light px-3 py-1 rounded-md hover:opacity-80"
+            className="flex items-center space-x-2 bg-background_light px-3 py-1 rounded-md hover:opacity-80"
           >
             <span>{selectedTokens.from.symbol}</span>
             <MdKeyboardArrowDown />
@@ -137,7 +137,7 @@ const TokenSwap = () => {
               setActiveField("to");
               setShowTokenModal(true);
             }}
-            className="flex items-center space-x-2 bg-gray-200 dark:bg-background_light px-3 py-1 rounded-md hover:opacity-80"
+            className="flex items-center space-x-2 bg-background_light px-3 py-1 rounded-md hover:opacity-80"
           >
             <span>{selectedTokens.to.symbol}</span>
             <MdKeyboardArrowDown />

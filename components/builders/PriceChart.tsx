@@ -12,6 +12,7 @@ import {
   type ChartOptions,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { calculateChange, formatCurrency } from "@/libs/utils";
 
 ChartJS.register(
   CategoryScale,
@@ -197,14 +198,15 @@ const PriceChart = () => {
   };
 
   return (
-    <div className="bg-background_light rounded-xl shadow-lg p-6 w-full max-w-4xl">
-      <div className="mb-6">
-        <div className="flex space-x-2 mb-6">
-          {Object.keys(timeRanges).map((range) => (
-            <button
-              key={range}
-              onClick={() => setTimeRange(range as TimeRange)}
-              className={`
+    <>
+      <div className="bg-background_light rounded-xl shadow-lg p-6 w-full max-w-4xl hidden">
+        <div className="mb-6">
+          <div className="flex space-x-2 mb-6">
+            {Object.keys(timeRanges).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range as TimeRange)}
+                className={`
                 px-4 py-2 rounded-md font-medium transition-all duration-200
                 ${
                   timeRange === range
@@ -212,16 +214,16 @@ const PriceChart = () => {
                     : "bg-gray-100 text-background_light hover:bg-gray-200"
                 }
               `}
-            >
-              {range}
-            </button>
-          ))}
-        </div>
+              >
+                {range}
+              </button>
+            ))}
+          </div>
 
-        <button
-          onClick={fetchPriceData}
-          disabled={isLoading}
-          className={`
+          <button
+            onClick={fetchPriceData}
+            disabled={isLoading}
+            className={`
             px-4 py-2 rounded-md font-medium mb-4
             ${
               isLoading
@@ -229,40 +231,41 @@ const PriceChart = () => {
                 : "bg-green-500 text-white hover:bg-green-600"
             }
           `}
-        >
-          {isLoading ? "Refreshing..." : "Refresh Data"}
-        </button>
-      </div>
+          >
+            {isLoading ? "Refreshing..." : "Refresh Data"}
+          </button>
+        </div>
 
-      <div className="h-[400px] relative">
-        {error ? (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-red-500 text-center">
-              <p className="font-medium mb-2">Error loading data</p>
-              <p className="text-sm text-gray-600">{error}</p>
-              <button
-                onClick={fetchPriceData}
-                className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-              >
-                Try Again
-              </button>
+        <div className="h-[400px] relative">
+          {error ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-red-500 text-center">
+                <p className="font-medium mb-2">Error loading data</p>
+                <p className="text-sm text-gray-600">{error}</p>
+                <button
+                  onClick={fetchPriceData}
+                  className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
+                >
+                  Try Again
+                </button>
+              </div>
             </div>
-          </div>
-        ) : isLoading ? (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-4 text-gray-600">Loading price data...</p>
+          ) : isLoading ? (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex flex-col items-center">
+                <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+                <p className="mt-4 text-gray-600">Loading price data...</p>
+              </div>
             </div>
-          </div>
-        ) : (
-          <Bar options={chartOptions} data={chartData} />
-        )}
+          ) : (
+            <Bar options={chartOptions} data={chartData} />
+          )}
+        </div>
       </div>
 
       {/* Price statistics */}
-      {/* {!isLoading && !error && (
-        <div className="mt-6 grid grid-cols-2 gap-4">
+      {!isLoading && !error && (
+        <div className="mt-[3.4rem] grid grid-cols-2 gap-4">
           <div className="p-4 bg-gray-50 rounded-lg">
             <h3 className="text-lg font-medium text-gray-800 mb-2">Bitcoin</h3>
             <p className="text-gray-600">
@@ -284,8 +287,8 @@ const PriceChart = () => {
             </p>
           </div>
         </div>
-      )} */}
-    </div>
+      )}
+    </>
   );
 };
 

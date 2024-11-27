@@ -6,10 +6,25 @@ import React from "react";
 
 const page = () => {
   return (
-    <section className="pt-6">
+    <section>
       <Hero />
-      <div className="w-full flex items-start justify-center gap-4 my-28">
-        <PriceChart />
+      <div className="w-full flex items-start justify-center gap-4 mt-16 mb-28">
+        <div className="w-[47%] text-center md:text-left">
+          <h1 className="text-4xl font-bold mb-4 text-primary tracking-wider">
+            Effortless Token Swaps at Your Fingertips
+          </h1>
+          <p className="">
+            Welcome to the future of decentralized finance. Swap tokens
+            effortlessly across multiple blockchains without intermediaries or
+            hidden fees. Our platform is designed for speed, transparency, and
+            security, empowering you to take control of your digital assets.
+            Whether you&apos;re an experienced trader or a DeFi newcomer, our
+            user-friendly interface ensures a smooth experience every time.
+            Start trading with confidence today—because your assets deserve the
+            best.
+          </p>
+          <PriceChart />
+        </div>
         <TokenSwap />
       </div>
       <div className="flex flex-col gap-12 items-center justify-center mb-20">
