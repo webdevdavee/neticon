@@ -11,8 +11,8 @@ const SpaceGrotesk = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Swap Neticon",
-  description: "Swap Neticon",
+  title: "Neticon | Swap Crypto Effortlessly",
+  description: "Swap Crypto Effortlessly",
 };
 
 export default function RootLayout({

@@ -71,11 +71,11 @@ const Hero = () => {
           Buy NFTs
         </Link>
       </motion.div>
-      <style jsx global>{`
+      {/* <style jsx global>{`
         .text-shadow-lg {
           text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
-      `}</style>
+      `}</style> */}
     </section>
   );
 };

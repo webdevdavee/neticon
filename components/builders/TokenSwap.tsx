@@ -4,7 +4,7 @@ import { useState } from "react";
 import { BiSearchAlt2 } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { IoSwapVertical } from "react-icons/io5";
-import { Modal } from "../layouts/Modal";
+import Modal from "../layouts/Modal";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import Button from "../ui/Button";
 import TextInput from "../ui/Textinput";

@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "../ui/Button";
 import Link from "next/link";
+import Image from "next/image";
 
 const Navbar = () => {
   return (
@@ -8,7 +9,8 @@ const Navbar = () => {
       <div className="relative py-4 px-8 backdrop-blur-md bg-base/70 border-b border-b-lighter">
         <nav className="flex items-center justify-between">
           <Link href="/" className="text-2xl">
-            Neticon
+            <Image src="/neticon.svg" width={30} height={30} alt="logo" />
+            {/* Neticon */}
           </Link>
           <ul className="flex items-center gap-8">
             <Link href="/swap" className="text-lg">

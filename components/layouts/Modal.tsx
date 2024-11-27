@@ -2,13 +2,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 
-interface ModalProps {
+type Props = {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
-}
+};
 
-export function Modal({ isOpen, onClose, children }: ModalProps) {
+const Modal: React.FC<Props> = ({ isOpen, onClose, children }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -51,4 +51,6 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
       )}
     </AnimatePresence>
   );
-}
+};
+
+export default Modal;
