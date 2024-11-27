@@ -199,7 +199,7 @@ const PriceChart = () => {
 
   return (
     <>
-      <div className="bg-background_light rounded-xl shadow-lg p-6 w-full max-w-4xl hidden">
+      <div className="bg-background_light rounded-xl shadow-lg p-6 w-full max-w-4xl">
         <div className="mb-6">
           <div className="flex space-x-2 mb-6">
             {Object.keys(timeRanges).map((range) => (
