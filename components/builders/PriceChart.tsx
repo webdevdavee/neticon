@@ -265,7 +265,7 @@ const PriceChart = () => {
 
       {/* Price statistics */}
       {!isLoading && !error && (
-        <div className="mt-[3.4rem] grid grid-cols-2 gap-4">
+        <div className="mt-8 grid grid-cols-2 gap-4">
           <div className="p-4 bg-gray-50 rounded-lg">
             <h3 className="text-lg font-medium text-gray-800 mb-2">Bitcoin</h3>
             <p className="text-gray-600">

@@ -60,7 +60,7 @@ const TokenSwap = () => {
   };
 
   return (
-    <div className="w-full max-w-md h-fit mx-auto p-8 bg-background_light rounded-xl shadow-lg">
+    <div className="w-full max-w-md h-fit p-8 bg-background_light rounded-xl shadow-lg">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-bold">Swap Tokens</h2>

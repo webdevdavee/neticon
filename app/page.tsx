@@ -8,7 +8,7 @@ const page = () => {
   return (
     <section>
       <Hero />
-      <div className="w-full flex items-start justify-center gap-4 mt-16 mb-28">
+      <div className="mx-auto max-w-6xl flex items-center justify-center gap-24 mt-16 mb-28">
         <div className="w-[47%] text-center md:text-left">
           <h1 className="text-4xl font-bold mb-4 text-primary tracking-wider">
             Effortless Token Swaps at Your Fingertips
