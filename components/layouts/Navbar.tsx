@@ -25,7 +25,7 @@ const Navbar = () => {
               alt="Neticon Logo"
               className="transition-transform hover:rotate-12"
             />
-            {/* <span className="text-lg font-semibold text-zinc-100">Neticon</span> */}
+            <span className="text-lg font-semibold text-zinc-100">Neticon</span>
           </Link>
 
           {/* Navigation Links */}
