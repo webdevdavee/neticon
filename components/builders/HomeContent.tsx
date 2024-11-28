@@ -6,24 +6,14 @@ import TokenSwap from "./TokenSwap";
 import { FaCoins, FaShieldAlt } from "react-icons/fa";
 import InfoCard from "../cards/InfoCard";
 import { motion } from "framer-motion";
+import StatsBoard from "./StatsBoard";
+import { fadeInUpVariants } from "@/constants";
 
 const HomeContent = () => {
-  const fadeInUpVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut",
-      },
-    },
-  };
-
   return (
-    <>
+    <section className="flex flex-col gap-40 py-16">
       <motion.div
-        className="mx-auto max-w-6xl flex items-center justify-center gap-24 mt-16 mb-28"
+        className="mx-auto max-w-6xl flex items-center justify-center gap-24 "
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -31,7 +21,7 @@ const HomeContent = () => {
       >
         <div className="w-[47%] flex flex-col gap-8">
           <motion.h1
-            className="text-4xl font-bold mb-4 text-primary tracking-wider"
+            className="text-4xl font-bold text-primary tracking-wider"
             variants={fadeInUpVariants}
           >
             Effortless Token Swaps at Your Fingertips
@@ -68,8 +58,11 @@ const HomeContent = () => {
           <TokenSwap />
         </motion.div>
       </motion.div>
+      <motion.div variants={fadeInUpVariants}>
+        <StatsBoard />
+      </motion.div>
       <motion.div
-        className="flex flex-col gap-12 items-center justify-center mb-20"
+        className="flex flex-col gap-12 items-center justify-center"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
@@ -101,7 +94,7 @@ const HomeContent = () => {
           ))}
         </motion.div>
       </motion.div>
-    </>
+    </section>
   );
 };
 
