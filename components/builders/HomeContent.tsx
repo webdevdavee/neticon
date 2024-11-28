@@ -8,6 +8,7 @@ import InfoCard from "../cards/InfoCard";
 import { motion } from "framer-motion";
 import StatsBoard from "./StatsBoard";
 import { fadeInUpVariants } from "@/constants";
+import DiscoverNFTs from "./DiscoverNFTs";
 
 const HomeContent = () => {
   return (
@@ -58,7 +59,20 @@ const HomeContent = () => {
           <TokenSwap />
         </motion.div>
       </motion.div>
-      <motion.div variants={fadeInUpVariants}>
+      <motion.div
+        variants={fadeInUpVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <DiscoverNFTs />
+      </motion.div>
+      <motion.div
+        variants={fadeInUpVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+      >
         <StatsBoard />
       </motion.div>
       <motion.div
