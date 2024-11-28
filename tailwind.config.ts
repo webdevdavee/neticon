@@ -13,6 +13,7 @@ export default {
         background_light: "#151515",
         lighter: "#1e1e1e",
         accent: "#dafb54",
+        secondary: "emerald-400",
       },
     },
   },
