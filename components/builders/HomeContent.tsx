@@ -7,12 +7,13 @@ import { FaCoins, FaShieldAlt } from "react-icons/fa";
 import InfoCard from "../cards/InfoCard";
 import { motion } from "framer-motion";
 import StatsBoard from "./StatsBoard";
-import { fadeInUpVariants } from "@/constants";
+import { fadeInUpVariants, supportedChains } from "@/constants";
 import DiscoverNFTs from "./DiscoverNFTs";
+import TransactionTable from "./TransactionTable";
 
 const HomeContent = () => {
   return (
-    <section className="flex flex-col gap-40 py-16">
+    <section className="flex flex-col gap-28 py-16">
       <motion.div
         className="mx-auto max-w-6xl flex items-center justify-center gap-24 "
         initial="hidden"
@@ -55,10 +56,12 @@ const HomeContent = () => {
             />
           </motion.div>
         </div>
+
         <motion.div variants={fadeInUpVariants}>
           <TokenSwap />
         </motion.div>
       </motion.div>
+
       <motion.div
         variants={fadeInUpVariants}
         initial="hidden"
@@ -67,6 +70,7 @@ const HomeContent = () => {
       >
         <DiscoverNFTs />
       </motion.div>
+
       <motion.div
         variants={fadeInUpVariants}
         initial="hidden"
@@ -75,38 +79,60 @@ const HomeContent = () => {
       >
         <StatsBoard />
       </motion.div>
+
+      <div className="bg-white/5 backdrop-blur-sm border border-zinc-800/50 rounded-md shadow-2xl overflow-hidden">
+        <div className="px-6 py-12 bg-zinc-900/30">
+          <motion.h1
+            className="text-xl font-semibold text-zinc-100 text-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeInUpVariants}
+            custom={0}
+          >
+            We support only Ethereum and its Layer 2 blockchains.
+          </motion.h1>
+        </div>
+
+        <div className="grid grid-cols-4 gap-4 p-6">
+          {supportedChains.map((chain, index) => (
+            <motion.div
+              key={chain.name}
+              className="flex flex-col items-center justify-center 
+                        border border-zinc-800/30 
+                        rounded-lg 
+                        py-6 
+                        hover:bg-zinc-900/10 
+                        transition-colors 
+                        duration-200"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.3 }}
+              variants={fadeInUpVariants}
+              custom={index + 1}
+            >
+              <div className="mb-4">
+                <Image
+                  src={chain.src}
+                  width={70}
+                  height={70}
+                  alt={chain.alt}
+                  className="grayscale hover:grayscale-0 transition-all duration-300"
+                />
+              </div>
+              <p className="text-sm text-zinc-300 font-medium">{chain.name}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
       <motion.div
-        className="flex flex-col gap-12 items-center justify-center"
+        variants={fadeInUpVariants}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        variants={fadeInUpVariants}
       >
-        <motion.h1 className="text-4xl text-center" variants={fadeInUpVariants}>
-          We support only Ethereum and its Layer 2 blockchains.
-        </motion.h1>
-        <motion.div
-          className="flex items-center gap-20"
-          variants={fadeInUpVariants}
-        >
-          {[
-            { src: "/images/ethereum.svg", alt: "ethereum", name: "Ethereum" },
-            { src: "/images/arbitrum.svg", alt: "arbitrum", name: "Arbitrum" },
-            { src: "/images/optimism.svg", alt: "optimism", name: "Optimism" },
-            { src: "/images/polygon.svg", alt: "polygon", name: "Polygon" },
-          ].map((chain, index) => (
-            <motion.div
-              key={chain.name}
-              className="border border-background_light py-6 px-10 flex flex-col items-center gap-4"
-              variants={fadeInUpVariants}
-              custom={index}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Image src={chain.src} width={70} height={70} alt={chain.alt} />
-              <p>{chain.name}</p>
-            </motion.div>
-          ))}
-        </motion.div>
+        <TransactionTable />
       </motion.div>
     </section>
   );

@@ -9,3 +9,10 @@ export const fadeInUpVariants = {
     },
   },
 };
+
+export const supportedChains = [
+  { src: "/images/ethereum.svg", alt: "ethereum", name: "Ethereum" },
+  { src: "/images/arbitrum.svg", alt: "arbitrum", name: "Arbitrum" },
+  { src: "/images/optimism.svg", alt: "optimism", name: "Optimism" },
+  { src: "/images/polygon.svg", alt: "polygon", name: "Polygon" },
+];

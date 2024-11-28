@@ -1,200 +1,133 @@
-import { motion } from "framer-motion";
 import React from "react";
-import { FaWallet, FaShoppingCart, FaRocket } from "react-icons/fa";
+import { motion } from "framer-motion";
+import { FaRocket } from "react-icons/fa";
 import Link from "next/link";
+import Image from "next/image";
 
 const DiscoverNFTs = () => {
   return (
-    <div
-      className="min-h-screen bg-gradient-to-br from-black via-purple-900 to-black 
-      text-white overflow-hidden relative rounded-md"
-    >
-      {/* Animated Background Elements */}
-      <motion.div
-        className="absolute top-0 left-0 w-full h-full opacity-20 
-          bg-gradient-to-r from-purple-500 to-blue-500 
-          animate-pulse"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.2 }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          repeatType: "reverse",
-        }}
-      />
-
-      {/* Header */}
-      <header className="relative z-10 p-6 flex justify-between items-center">
-        <motion.h1
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl font-bold"
+    <div className="min-h-screen bg-background_light text-white overflow-hidden relative">
+      {/* Layered Background with Artistic Elements */}
+      <div className="absolute inset-0 opacity-20 pointer-events-none">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1440 810"
+          preserveAspectRatio="xMinYMin slice"
+          className="absolute w-full h-full"
         >
-          Explore our NFT marketplace
-        </motion.h1>
-      </header>
+          <defs>
+            <linearGradient
+              id="artBackground"
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="rgba(39, 39, 42, 0.3)" />
+              <stop offset="100%" stopColor="rgba(24, 24, 27, 0.6)" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,288L48,272C96,256,192,224,288,197.3C384,171,480,149,576,165.3C672,181,768,235,864,261.3C960,288,1056,288,1152,266.7C1248,245,1344,203,1392,181.3L1440,160L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"
+            fill="url(#artBackground)"
+          />
+        </svg>
+      </div>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-16 grid md:grid-cols-2 gap-12 relative z-10">
-        {/* Left Side - Hero Content */}
+      <div className="container mx-auto px-6 py-16 relative z-10 grid md:grid-cols-2 gap-12 min-h-screen items-center">
+        {/* Left Content */}
         <motion.div
           initial={{ opacity: 0, x: -100 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7 }}
-          className="space-y-6 self-center"
+          className="space-y-8"
         >
-          <h1 className="text-4xl font-extrabold leading-tight">
-            Transform Your Digital
-            <br />
-            <span
-              className="text-transparent bg-clip-text 
-              bg-gradient-to-r from-purple-500 to-blue-500"
+          <div className="overflow-hidden">
+            <motion.h1
+              initial={{ x: -50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.6 }}
+              className="text-5xl font-bold mb-6 text-zinc-100"
             >
-              Asset Experience
-            </span>
-          </h1>
-          <p className="text-lg text-gray-300 mb-8">
-            Unlock the potential of digital ownership. Seamlessly navigate the
-            world of blockchain-powered assets with our intuitive platform.
+              Digital Art <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-400 to-zinc-600">
+                Reimagined
+              </span>
+            </motion.h1>
+          </div>
+
+          <p className="text-zinc-400 text-lg mb-8 leading-relaxed">
+            Transform your digital art experience with our cutting-edge NFT
+            platform. Discover, collect, and trade unique digital masterpieces
+            that push the boundaries of creativity and blockchain technology.
           </p>
-          <div className="flex space-x-4">
+
+          <div className="flex space-x-6">
             <Link
-              href="https://hazee.vercel.app"
-              target="blank"
-              className="bg-purple-600 hover:bg-purple-700 
-                text-white px-8 py-3 rounded-full 
-                flex items-center space-x-2 transition-all duration-300 hover:scale-[1.05] hover:duration-300 hover:transition-all"
+              href="#"
+              className="group flex items-center gap-3 px-8 py-3 bg-zinc-700 hover:bg-accent rounded-full text-white hover:text-background_light transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
             >
-              <FaRocket />
-              <span>Start Exploring</span>
+              <FaRocket className="text-zinc-300 transition-colors duration-300 group-hover:text-background_light" />
+              <span>Explore Collection</span>
             </Link>
           </div>
         </motion.div>
 
-        {/* Right Side - Animated Graphic Placeholder */}
+        {/* Right Content - Artistic NFT Representation */}
         <motion.div
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 2 }}
+          transition={{ duration: 0.7 }}
           className="flex items-center justify-center"
         >
-          <motion.svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 400 400"
-            className="w-full max-w-md h-96"
+          <motion.div
+            className="w-full max-w-md aspect-square relative"
             animate={{
-              scale: [1, 1.05, 1],
               rotate: [0, 5, -5, 0],
+              scale: [1, 1.02, 1],
             }}
             transition={{
-              duration: 10,
+              duration: 5,
               repeat: Infinity,
               repeatType: "loop",
               ease: "easeInOut",
             }}
           >
-            {/* Gradient Definitions */}
-            <defs>
-              <linearGradient
-                id="nftGradient1"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="100%"
-              >
-                <stop offset="0%" stopColor="#8A4FFF" stopOpacity="1" />
-                <stop offset="100%" stopColor="#3CABFF" stopOpacity="1" />
-              </linearGradient>
-              <linearGradient
-                id="nftGradient2"
-                x1="0%"
-                y1="0%"
-                x2="100%"
-                y2="100%"
-              >
-                <stop offset="0%" stopColor="#dafb54" stopOpacity="1" />
-                <stop offset="100%" stopColor="#dafb54" stopOpacity="1" />
-              </linearGradient>
-            </defs>
+            {/* First layer - back */}
+            <div className="absolute inset-0 bg-gradient-to-br from-zinc-700 to-zinc-900 rounded-3xl shadow-2xl transform -rotate-6" />
 
-            {/* Multiple NFT Tokens/Cards */}
-            <g transform="translate(200, 200)">
-              {/* First NFT Token */}
-              <g transform="translate(-100, -50) rotate(-10)">
-                <rect
-                  x="-60"
-                  y="-80"
-                  width="120"
-                  height="160"
-                  rx="15"
-                  fill="url(#nftGradient1)"
-                  opacity="0.9"
-                />
-                <circle cx="0" cy="-130" r="20" fill="#FFFFFF" opacity="0.7" />
-              </g>
+            {/* Second layer - middle */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-zinc-600 to-zinc-800 rounded-3xl shadow-2xl transform rotate-6" />
 
-              {/* Second NFT Token */}
-              <g transform="translate(100, 50) rotate(10)">
-                <rect
-                  x="-60"
-                  y="-80"
-                  width="120"
-                  height="160"
-                  rx="15"
-                  fill="url(#nftGradient2)"
-                  opacity="0.9"
-                />
-                <circle cx="0" cy="-130" r="20" fill="#FFFFFF" opacity="0.7" />
-              </g>
+            {/* Third layer - front */}
+            <div className="absolute inset-4 bg-gradient-to-bl from-zinc-500 to-zinc-900 rounded-2xl shadow-2xl opacity-80" />
 
-              {/* Connecting Elements */}
-              <line
-                x1="-50"
-                y1="0"
-                x2="50"
-                y2="0"
-                stroke="white"
-                strokeWidth="3"
-                strokeDasharray="10 5"
-                opacity="0.4"
-              />
-            </g>
-          </motion.svg>
+            {/* Images with staggered positioning */}
+            <Image
+              className="absolute top-0 left-0 w-full h-full object-cover rounded-3xl opacity-80 transform -rotate-3 origin-center"
+              src="/images/nftshowcase (1).webp"
+              fill
+              alt="NFT Showcase 1"
+            />
+            <Image
+              className="absolute top-2 left-2 w-full h-full object-cover rounded-3xl opacity-70 transform rotate-3 origin-center"
+              src="/images/nftshowcase (2).webp"
+              fill
+              alt="NFT Showcase 2"
+            />
+            <Image
+              className="absolute top-4 left-4 w-full h-full object-cover rounded-3xl opacity-100 transform -rotate-2 origin-center"
+              src="/images/nftshowcase (3).webp"
+              fill
+              alt="NFT Showcase 3"
+            />
+          </motion.div>
         </motion.div>
-      </main>
+      </div>
 
-      {/* Features Section */}
-      <section className="container mx-auto px-6 py-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="grid md:grid-cols-3 gap-8"
-        >
-          <div className="bg-white/10 p-8 rounded-2xl">
-            <FaWallet className="mx-auto text-5xl text-purple-500 mb-4" />
-            <h3 className="text-xl font-bold mb-3">Secure Assets</h3>
-            <p className="text-gray-300 text-sm">
-              Advanced security protocols to protect your digital investments.
-            </p>
-          </div>
-          <div className="bg-white/10 p-8 rounded-2xl">
-            <FaShoppingCart className="mx-auto text-5xl text-blue-500 mb-4" />
-            <h3 className="text-xl font-bold mb-3">Seamless Trading</h3>
-            <p className="text-gray-300 text-sm">
-              Intuitive platform for effortless digital asset transactions.
-            </p>
-          </div>
-          <div className="bg-white/10 p-8 rounded-2xl">
-            <FaRocket className="mx-auto text-5xl text-green-500 mb-4" />
-            <h3 className="text-xl font-bold mb-3">Fast Onboarding</h3>
-            <p className="text-gray-300 text-sm">
-              Get started quickly with our user-friendly interface.
-            </p>
-          </div>
-        </motion.div>
-      </section>
+      {/* Bottom Accent */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-zinc-700 to-accent opacity-50" />
     </div>
   );
 };
