@@ -65,7 +65,8 @@ const DiscoverNFTs = () => {
 
           <div className="flex space-x-6">
             <Link
-              href="#"
+              href="https://hazee.vercel.app"
+              target="blank"
               className="group flex items-center gap-3 px-8 py-3 bg-zinc-700 hover:bg-accent rounded-full text-white hover:text-background_light transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
             >
               <FaRocket className="text-zinc-300 transition-colors duration-300 group-hover:text-background_light" />

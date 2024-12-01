@@ -26,11 +26,11 @@ const HomeContent = () => {
             className="text-4xl font-bold text-primary tracking-wider"
             variants={fadeInUpVariants}
           >
-            Effortless Token Swaps at Your Fingertips
+            Effortless Token Swaps on Ethereum
           </motion.h1>
           <motion.p variants={fadeInUpVariants}>
             Welcome to the future of decentralized finance. Swap tokens
-            effortlessly across multiple blockchains without intermediaries or
+            seamlessly within the Ethereum ecosystem without intermediaries or
             hidden fees. Our platform is designed for speed, transparency, and
             security, empowering you to take control of your digital assets.
             Whether you&apos;re an experienced trader or a DeFi newcomer, our
@@ -38,6 +38,7 @@ const HomeContent = () => {
             Start trading with confidence today—because your assets deserve the
             best.
           </motion.p>
+
           <motion.div
             className="flex items-center gap-8"
             variants={fadeInUpVariants}

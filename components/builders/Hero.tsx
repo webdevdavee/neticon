@@ -35,7 +35,7 @@ const Hero = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              Cross-Chain Transactions
+              Effortless Ethereum Trading
             </motion.h1>
             <motion.h1
               className="text-4xl sm:text-6xl font-bold text-accent"
@@ -53,8 +53,7 @@ const Hero = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
           >
-            Effortless Asset Swaps Across Networks with Seamless
-            Interoperability
+            Trade Assets Seamlessly Within the Ethereum Ecosystem
           </motion.p>
         </div>
 
