@@ -31,11 +31,7 @@ const Navbar = () => {
           {/* Navigation Links */}
           <ul className="flex items-center gap-8">
             <NavLink href="/swap" icon={<FaExchangeAlt />} label="Swap" />
-            <NavLink
-              href="/liquidity-pool"
-              icon={<FaLayerGroup />}
-              label="Liquidity"
-            />
+            <NavLink href="/pools" icon={<FaLayerGroup />} label="Liquidity" />
             <NavLink
               href="https://hazee.vercel.app/"
               icon={<FaPaintBrush />}

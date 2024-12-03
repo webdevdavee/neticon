@@ -7,10 +7,19 @@ export const calculateChange = (prices: number[]): string => {
 };
 
 export const formatCurrency = (value: number): string => {
-  return new Intl.NumberFormat("en-US", {
+  return value.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
-  }).format(value);
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
+export const calculatePoolShare = (
+  depositAmount: number,
+  totalValueLocked: number
+): number => {
+  return (depositAmount / totalValueLocked) * 100;
 };
 
 export const truncateAddress = (address: string) => {

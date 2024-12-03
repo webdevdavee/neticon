@@ -10,3 +10,28 @@ export interface Transaction {
   tokenAmount2: number;
   walletAddress: string;
 }
+
+export interface Token {
+  symbol: string;
+  amount: number;
+}
+
+export interface LiquidityPool {
+  id: string;
+  pair: string;
+  totalValueLocked: number;
+  apr: number;
+  volume24h: number;
+  myLiquidity: number;
+  tokens: {
+    token1: Token;
+    token2: Token;
+  };
+}
+
+export interface DepositAmounts {
+  [poolId: string]: {
+    token1: number;
+    token2: number;
+  };
+}
