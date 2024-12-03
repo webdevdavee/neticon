@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
+import Modal from "./Modal";
 
 type Props = {
   isFeeTierModalOpen: boolean;
@@ -29,62 +29,51 @@ const FeeTierModal: React.FC<Props> = ({
   setSelectedFeeTier,
   selectedFeeTier,
 }) => {
-  if (!isFeeTierModalOpen) return null;
-
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-        onClick={() => setIsFeeTierModalOpen(false)}
-      >
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          className="bg-zinc-900 w-96 rounded-2xl border border-zinc-800/50 shadow-2xl"
-        >
-          <div className="px-6 py-4 bg-zinc-900/30 flex justify-between items-center">
-            <h3 className="text-xl font-semibold text-zinc-100">
-              Select Fee Tier
-            </h3>
-            <button
-              onClick={() => setIsFeeTierModalOpen(false)}
-              className="text-zinc-500 hover:text-zinc-300"
-            >
-              <FaTimes />
-            </button>
-          </div>
+    <Modal
+      isOpen={isFeeTierModalOpen}
+      onClose={() => setIsFeeTierModalOpen(false)}
+    >
+      <div className="bg-zinc-900 rounded-2xl">
+        <div className="px-6 py-4 flex justify-between items-center border-b border-zinc-800/50">
+          <h3 className="text-xl font-semibold text-zinc-100">
+            Select Fee Tier
+          </h3>
+          <button
+            onClick={() => setIsFeeTierModalOpen(false)}
+            className="text-zinc-500 hover:text-zinc-300"
+          >
+            <FaTimes />
+          </button>
+        </div>
 
-          <div className="p-4 space-y-2">
-            {FEE_TIERS.map((tier) => (
-              <button
-                key={tier.value}
-                onClick={() => {
-                  setSelectedFeeTier(tier);
-                  setIsFeeTierModalOpen(false);
-                }}
-                className={`
-                  w-full flex items-center justify-between p-3 rounded-lg 
-                  ${
-                    selectedFeeTier.value === tier.value
-                      ? "bg-accent/20"
-                      : "hover:bg-zinc-800"
-                  }
-                  transition-colors
-                `}
-              >
-                <div>
-                  <p className="text-zinc-200 font-medium">{tier.label}</p>
-                </div>
-                <span className="text-zinc-400">{tier.value}%</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+        <div className="p-4 space-y-2">
+          {FEE_TIERS.map((tier) => (
+            <button
+              key={tier.value}
+              onClick={() => {
+                setSelectedFeeTier(tier);
+                setIsFeeTierModalOpen(false);
+              }}
+              className={`
+                w-full flex items-center justify-between p-3 rounded-lg 
+                ${
+                  selectedFeeTier.value === tier.value
+                    ? "bg-accent/20"
+                    : "hover:bg-zinc-800"
+                }
+                transition-colors
+              `}
+            >
+              <div>
+                <p className="text-zinc-200 font-medium">{tier.label}</p>
+              </div>
+              <span className="text-zinc-400">{tier.value}%</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </Modal>
   );
 };
 

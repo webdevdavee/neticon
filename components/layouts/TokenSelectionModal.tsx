@@ -1,8 +1,9 @@
 "use client";
 
+import React, { useState, useMemo } from "react";
+import { FaCoins, FaTimes, FaSearch } from "react-icons/fa";
 import { Token } from "@/types";
-import { FaCoins, FaTimes } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import Modal from "./Modal";
 
 type Props = {
   tokens: Token[];
@@ -19,39 +20,55 @@ const TokenSelectionModal: React.FC<Props> = ({
   onSelect,
   selectedToken,
 }) => {
-  if (!isOpen) return null;
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredTokens = useMemo(() => {
+    if (!searchQuery) return tokens;
+
+    const lowercaseQuery = searchQuery.toLowerCase();
+    return tokens.filter(
+      (token) =>
+        token.symbol.toLowerCase().includes(lowercaseQuery) ||
+        token.amount.toString().includes(lowercaseQuery)
+    );
+  }, [tokens, searchQuery]);
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-        onClick={onClose}
-      >
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          className="bg-zinc-900 w-96 rounded-2xl border border-zinc-800/50 shadow-2xl"
-        >
-          <div className="px-6 py-4 bg-zinc-900/30 flex justify-between items-center">
-            <h3 className="text-xl font-semibold text-zinc-100">
-              Select Token
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-zinc-500 hover:text-zinc-300"
-            >
-              <FaTimes />
-            </button>
-          </div>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="bg-zinc-900 rounded-2xl">
+        <div className="px-6 py-4 flex justify-between items-center border-b border-zinc-800/50">
+          <h3 className="text-xl font-semibold text-zinc-100">Select Token</h3>
+          <button
+            onClick={onClose}
+            className="text-zinc-500 hover:text-zinc-300"
+          >
+            <FaTimes />
+          </button>
+        </div>
 
-          <div className="p-4 max-h-96 overflow-y-auto">
-            {tokens.map((token) => (
+        {/* Search Bar */}
+        <div className="px-4 py-2">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search tokens"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-zinc-800 text-zinc-200 rounded-lg py-2 px-10 outline-none"
+            />
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
+          </div>
+        </div>
+
+        <div className="p-4 max-h-96 overflow-y-auto">
+          {filteredTokens.length > 0 ? (
+            filteredTokens.map((token) => (
               <button
                 key={token.symbol}
-                onClick={() => onSelect(token)}
+                onClick={() => {
+                  onSelect(token);
+                  onClose();
+                }}
                 className={`
                   w-full flex items-center justify-between p-3 rounded-lg mb-2 
                   ${
@@ -71,11 +88,13 @@ const TokenSelectionModal: React.FC<Props> = ({
                 </div>
                 <span className="text-zinc-400">{token.amount.toFixed(4)}</span>
               </button>
-            ))}
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+            ))
+          ) : (
+            <p className="text-center text-zinc-500">No tokens found</p>
+          )}
+        </div>
+      </div>
+    </Modal>
   );
 };
 

@@ -1,18 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { BiSearchAlt2 } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { IoSwapVertical } from "react-icons/io5";
+import { FaTimes } from "react-icons/fa";
+import TokenSelectionModal from "../layouts/TokenSelectionModal";
 import Modal from "../layouts/Modal";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import Button from "../ui/Button";
 import TextInput from "../ui/Textinput";
 
 const mockTokens = [
-  { symbol: "ETH", name: "Ethereum", balance: "1.5", address: "0x...1" },
-  { symbol: "USDT", name: "Tether", balance: "1000", address: "0x...2" },
-  { symbol: "USDC", name: "USD Coin", balance: "1000", address: "0x...3" },
+  { symbol: "ETH", amount: 1.5 },
+  { symbol: "USDT", amount: 1000 },
+  { symbol: "USDC", amount: 1000 },
 ];
 
 const TokenSwap = ({
@@ -25,7 +26,6 @@ const TokenSwap = ({
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [activeField, setActiveField] = useState<"from" | "to" | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
   const [slippage, setSlippage] = useState("0.5");
   const [fromAmount, setFromAmount] = useState("");
   const [selectedTokens, setSelectedTokens] = useState({
@@ -44,19 +44,12 @@ const TokenSwap = ({
   };
 
   const handleMaxAmount = () => {
-    setFromAmount(selectedTokens.from.balance);
+    setFromAmount(selectedTokens.from.amount.toString());
   };
 
   const handleHalfAmount = () => {
-    setFromAmount((Number(selectedTokens.from.balance) / 2).toString());
+    setFromAmount((selectedTokens.from.amount / 2).toString());
   };
-
-  const filteredTokens = mockTokens.filter(
-    (token) =>
-      token.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      token.address.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const swapTokenPositions = () => {
     setSelectedTokens((prev) => ({
@@ -157,73 +150,65 @@ const TokenSwap = ({
       </button>
 
       {/* Token Selection Modal */}
-      <Modal isOpen={showTokenModal} onClose={() => setShowTokenModal(false)}>
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold">Select Token</h3>
-          <div className="relative">
-            <TextInput
-              label="none"
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              customStyle="w-full px-4 py-2 pl-10 rounded-lg outline-none"
-              placeholder="Search by name or paste address"
-            />
-            <BiSearchAlt2 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-          </div>
-          <div className="max-h-60 overflow-y-auto space-y-2">
-            {filteredTokens.map((token) => (
-              <button
-                key={token.address}
-                onClick={() => handleTokenSelect(token)}
-                className="w-full flex items-center justify-between p-2 hover:bg-background_light rounded-md transition-colors"
-              >
-                <span>{token.symbol}</span>
-                <span>{token.balance}</span>
-              </button>
-            ))}
-          </div>
-          <p className="text-sm">
-            Can&apos;t find the token you&apos;re looking for? Try entering the
-            mint address or check token list settings below.
-          </p>
-        </div>
-      </Modal>
+      <TokenSelectionModal
+        tokens={mockTokens}
+        isOpen={showTokenModal}
+        onClose={() => setShowTokenModal(false)}
+        onSelect={handleTokenSelect}
+        selectedToken={
+          activeField === "from" ? selectedTokens.from : selectedTokens.to
+        }
+      />
 
       {/* Settings Modal */}
       <Modal
         isOpen={showSettingsModal}
         onClose={() => setShowSettingsModal(false)}
       >
-        <div className="space-y-4">
-          <h3 className="text-lg font-bold">Transaction Settings</h3>
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Slippage Tolerance
-            </label>
-            <div className="flex space-x-2">
-              {["0.1", "0.5", "1.0"].map((value) => (
-                <button
-                  key={value}
-                  onClick={() => setSlippage(value)}
-                  className={`px-3 py-1 rounded-lg ${
-                    slippage === value
-                      ? "bg-accent text-background"
-                      : "bg-background_light"
-                  }`}
-                >
-                  {value}%
-                </button>
-              ))}
-              <div className="relative flex items-center px-2 py-1 bg-background_light rounded-lg">
-                <p className="mr-3">Enter custom: </p>
-                <input
-                  type="number"
-                  value={slippage}
-                  onChange={(e) => setSlippage(e.target.value)}
-                  className="w-20 pr-6 bg-background_light outline-none"
-                />
-                <span className="absolute right-2">%</span>
+        <div className="bg-zinc-900 rounded-2xl">
+          <div className="px-6 py-4 flex justify-between items-center border-b border-zinc-800/50">
+            <h3 className="text-xl font-semibold text-zinc-100">
+              Transaction Settings
+            </h3>
+            <button
+              onClick={() => setShowSettingsModal(false)}
+              className="text-zinc-500 hover:text-zinc-300"
+            >
+              <FaTimes />
+            </button>
+          </div>
+
+          <div className="p-6 space-y-4">
+            <div>
+              <label className="block text-zinc-300 text-sm font-medium mb-2">
+                Slippage Tolerance
+              </label>
+              <div className="flex space-x-2">
+                {["0.1", "0.5", "1.0"].map((value) => (
+                  <button
+                    key={value}
+                    onClick={() => setSlippage(value)}
+                    className={`
+                      px-3 py-2 rounded-lg transition-colors
+                      ${
+                        slippage === value
+                          ? "bg-accent text-background_light"
+                          : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700"
+                      }
+                    `}
+                  >
+                    {value}%
+                  </button>
+                ))}
+                <div className="relative flex items-center px-3 py-2 bg-zinc-800 rounded-lg">
+                  <input
+                    type="number"
+                    value={slippage}
+                    onChange={(e) => setSlippage(e.target.value)}
+                    className="w-20 bg-transparent text-zinc-200 outline-none"
+                  />
+                  <span className="text-zinc-500 ml-2">%</span>
+                </div>
               </div>
             </div>
           </div>

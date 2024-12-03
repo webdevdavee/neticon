@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { IoClose } from "react-icons/io5";
 
 type Props = {
   isOpen: boolean;
@@ -37,16 +36,8 @@ const Modal: React.FC<Props> = ({ isOpen, onClose, children }) => {
             transition={{ duration: 0.2 }}
             className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
           >
-            <div className="bg-lighter rounded-lg shadow-xl max-w-md w-full mx-4 pointer-events-auto">
-              <div className="flex justify-end p-2">
-                <button
-                  onClick={onClose}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  <IoClose size={24} />
-                </button>
-              </div>
-              <div className="p-4">{children}</div>
+            <div className="max-w-md w-full mx-4 pointer-events-auto bg-background_light rounded-lg shadow-xl">
+              {children}
             </div>
           </motion.div>
         </>

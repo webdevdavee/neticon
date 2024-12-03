@@ -14,6 +14,7 @@ export interface Transaction {
 export interface Token {
   symbol: string;
   amount: number;
+  address?: string;
 }
 
 export interface LiquidityPool {
