@@ -1,184 +1,447 @@
 "use client";
-"use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import {
-  FaPlus,
+  FaWater,
   FaCoins,
-  FaWallet,
-  FaExchangeAlt,
-  FaPercentage,
+  FaPlus,
+  FaArrowDown,
+  FaChartLine,
+  FaTimes,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { useToast } from "@/context/ToastProvider";
 
-interface NewPoolData {
-  token1: string;
-  token2: string;
-  initialLiquidity1: number;
-  initialLiquidity2: number;
-  initialApr: number;
-}
+import { Token } from "@/types";
 
-const AddPool: React.FC = () => {
-  const { addToast } = useToast();
-  const [poolData, setPoolData] = useState<NewPoolData>({
-    token1: "",
-    token2: "",
-    initialLiquidity1: 0,
-    initialLiquidity2: 0,
-    initialApr: 0,
-  });
+// Fee Tiers typical in DEXs
+const FEE_TIERS = [
+  { value: 0.01, label: "0.01% - Stable Pairs" },
+  { value: 0.05, label: "0.05% - Low Volatility" },
+  { value: 0.3, label: "0.3% - Standard" },
+  { value: 1, label: "1% - Exotic Pairs" },
+];
 
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: keyof NewPoolData
-  ) => {
-    setPoolData({
-      ...poolData,
-      [field]: e.target.value,
+// Mock token list (would be replaced with actual token data)
+const mockTokens: Token[] = [
+  { symbol: "ETH", amount: 2.5 },
+  { symbol: "USDC", amount: 5678.9 },
+  { symbol: "USDT", amount: 4321.56 },
+  { symbol: "DAI", amount: 3456.78 },
+];
+
+const AddLiquidityPool: React.FC = () => {
+  const [selectedTokenA, setSelectedTokenA] = useState<Token | null>(null);
+  const [selectedTokenB, setSelectedTokenB] = useState<Token | null>(null);
+  const [tokenAAmount, setTokenAAmount] = useState<string>("");
+  const [tokenBAmount, setTokenBAmount] = useState<string>("");
+  const [selectedFeeTier, setSelectedFeeTier] = useState(FEE_TIERS[2]); // Default to 0.3%
+  const [priceRangeType, setPriceRangeType] = useState<"full" | "custom">(
+    "full"
+  );
+  const [minPrice, setMinPrice] = useState<string>("");
+  const [maxPrice, setMaxPrice] = useState<string>("");
+
+  const [isTokenAModalOpen, setIsTokenAModalOpen] = useState(false);
+  const [isTokenBModalOpen, setIsTokenBModalOpen] = useState(false);
+  const [isFeeTierModalOpen, setIsFeeTierModalOpen] = useState(false);
+
+  // Available tokens filtering logic
+  const availableTokensA = useMemo(
+    () => mockTokens.filter((token) => token !== selectedTokenB),
+    [selectedTokenB]
+  );
+
+  const availableTokensB = useMemo(
+    () => mockTokens.filter((token) => token !== selectedTokenA),
+    [selectedTokenA]
+  );
+
+  // Validate liquidity deposit
+  const canDeposit = useMemo(() => {
+    const hasValidTokens = selectedTokenA && selectedTokenB;
+    const hasValidAmounts =
+      parseFloat(tokenAAmount) > 0 && parseFloat(tokenBAmount) > 0;
+    const hasValidPriceRange =
+      priceRangeType === "full" ||
+      (parseFloat(minPrice) > 0 && parseFloat(maxPrice) > parseFloat(minPrice));
+
+    return hasValidTokens && hasValidAmounts && hasValidPriceRange;
+  }, [
+    selectedTokenA,
+    selectedTokenB,
+    tokenAAmount,
+    tokenBAmount,
+    priceRangeType,
+    minPrice,
+    maxPrice,
+  ]);
+
+  // Handle deposit submission
+  const handleDeposit = () => {
+    if (!canDeposit) {
+      alert("Please check your token selections, amounts, and price range");
+      return;
+    }
+
+    // Simulated deposit logic
+    console.log("Depositing Liquidity", {
+      tokenA: {
+        symbol: selectedTokenA?.symbol,
+        amount: parseFloat(tokenAAmount),
+      },
+      tokenB: {
+        symbol: selectedTokenB?.symbol,
+        amount: parseFloat(tokenBAmount),
+      },
+      feeTier: selectedFeeTier,
+      priceRange:
+        priceRangeType === "full" ? "Full Range" : `${minPrice} - ${maxPrice}`,
     });
   };
 
-  const validatePoolData = (): boolean => {
-    const { token1, token2, initialLiquidity1, initialLiquidity2, initialApr } =
-      poolData;
-
-    if (!token1 || !token2) {
-      addToast("Token symbols are required", "error");
-      return false;
+  // Token selection handler
+  const handleTokenSelect = (token: Token, isTokenA: boolean) => {
+    if (isTokenA) {
+      setSelectedTokenA(token);
+      setIsTokenAModalOpen(false);
+    } else {
+      setSelectedTokenB(token);
+      setIsTokenBModalOpen(false);
     }
-
-    if (token1 === token2) {
-      addToast("Tokens must be different", "error");
-      return false;
-    }
-
-    if (initialLiquidity1 <= 0 || initialLiquidity2 <= 0) {
-      addToast("Initial liquidity must be greater than zero", "error");
-      return false;
-    }
-
-    if (initialApr < 0 || initialApr > 100) {
-      addToast("APR must be between 0 and 100", "error");
-      return false;
-    }
-
-    return true;
   };
 
-  const handleCreatePool = () => {
-    if (validatePoolData()) {
-      // Simulated pool creation logic
-      console.log("Creating pool:", poolData);
-      addToast(
-        `${poolData.token1}/${poolData.token2} pool created successfully!`,
-        "success"
-      );
-      // Reset form or navigate
-      setPoolData({
-        token1: "",
-        token2: "",
-        initialLiquidity1: 0,
-        initialLiquidity2: 0,
-        initialApr: 0,
-      });
-    }
+  // Token selection modal component
+  const TokenSelectionModal = ({
+    tokens,
+    isOpen,
+    onClose,
+    onSelect,
+    selectedToken,
+  }: {
+    tokens: Token[];
+    isOpen: boolean;
+    onClose: () => void;
+    onSelect: (token: Token) => void;
+    selectedToken: Token | null;
+  }) => {
+    if (!isOpen) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      >
+        <motion.div
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          className="bg-zinc-900 w-96 rounded-2xl border border-zinc-800/50 shadow-2xl"
+        >
+          <div className="px-6 py-4 bg-zinc-900/30 flex justify-between items-center">
+            <h3 className="text-xl font-semibold text-zinc-100">
+              Select Token
+            </h3>
+            <button
+              onClick={onClose}
+              className="text-zinc-500 hover:text-zinc-300"
+            >
+              <FaTimes />
+            </button>
+          </div>
+
+          <div className="p-4 max-h-96 overflow-y-auto">
+            {tokens.map((token) => (
+              <button
+                key={token.symbol}
+                onClick={() => onSelect(token)}
+                className={`
+                  w-full flex items-center justify-between p-3 rounded-lg mb-2 
+                  ${
+                    selectedToken === token
+                      ? "bg-accent/20"
+                      : "hover:bg-zinc-800"
+                  }
+                  transition-colors
+                `}
+              >
+                <div className="flex items-center">
+                  <FaCoins className="mr-3 text-zinc-500" />
+                  <div className="text-left">
+                    <p className="text-zinc-200 font-medium">{token.symbol}</p>
+                    <p className="text-xs text-zinc-500">{token.symbol}</p>
+                  </div>
+                </div>
+                <span className="text-zinc-400">{token.amount.toFixed(4)}</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  };
+
+  // Fee Tier Selection Modal
+  const FeeTierModal = () => {
+    if (!isFeeTierModalOpen) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      >
+        <motion.div
+          initial={{ scale: 0.9 }}
+          animate={{ scale: 1 }}
+          className="bg-zinc-900 w-96 rounded-2xl border border-zinc-800/50 shadow-2xl"
+        >
+          <div className="px-6 py-4 bg-zinc-900/30 flex justify-between items-center">
+            <h3 className="text-xl font-semibold text-zinc-100">
+              Select Fee Tier
+            </h3>
+            <button
+              onClick={() => setIsFeeTierModalOpen(false)}
+              className="text-zinc-500 hover:text-zinc-300"
+            >
+              <FaTimes />
+            </button>
+          </div>
+
+          <div className="p-4 space-y-2">
+            {FEE_TIERS.map((tier) => (
+              <button
+                key={tier.value}
+                onClick={() => {
+                  setSelectedFeeTier(tier);
+                  setIsFeeTierModalOpen(false);
+                }}
+                className={`
+                  w-full flex items-center justify-between p-3 rounded-lg 
+                  ${
+                    selectedFeeTier.value === tier.value
+                      ? "bg-accent/20"
+                      : "hover:bg-zinc-800"
+                  }
+                  transition-colors
+                `}
+              >
+                <div>
+                  <p className="text-zinc-200 font-medium">{tier.label}</p>
+                </div>
+                <span className="text-zinc-400">{tier.value}%</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </motion.div>
+    );
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white/5 backdrop-blur-sm border border-zinc-800/50 rounded-2xl shadow-2xl p-8"
-      >
-        <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center">
-          <FaExchangeAlt className="mr-3 text-zinc-400" /> Create New Liquidity
-          Pool
-        </h2>
-
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div className="flex items-center bg-zinc-900/30 rounded-lg p-3">
-              <FaCoins className="mr-3 text-zinc-500" />
-              <input
-                type="text"
-                placeholder="First Token Symbol (e.g., ETH)"
-                value={poolData.token1}
-                onChange={(e) => handleInputChange(e, "token1")}
-                className="bg-transparent text-zinc-200 w-full outline-none"
-              />
-            </div>
-
-            <div className="flex items-center bg-zinc-900/30 rounded-lg p-3">
-              <FaCoins className="mr-3 text-zinc-500" />
-              <input
-                type="text"
-                placeholder="Second Token Symbol (e.g., USDC)"
-                value={poolData.token2}
-                onChange={(e) => handleInputChange(e, "token2")}
-                className="bg-transparent text-zinc-200 w-full outline-none"
-              />
-            </div>
-
-            <div className="flex items-center bg-zinc-900/30 rounded-lg p-3">
-              <FaWallet className="mr-3 text-zinc-500" />
-              <input
-                type="number"
-                placeholder={`Initial ${poolData.token1 || "Token1"} Liquidity`}
-                value={poolData.initialLiquidity1 || ""}
-                onChange={(e) => handleInputChange(e, "initialLiquidity1")}
-                className="bg-transparent text-zinc-200 w-full outline-none"
-              />
-            </div>
-
-            <div className="flex items-center bg-zinc-900/30 rounded-lg p-3">
-              <FaWallet className="mr-3 text-zinc-500" />
-              <input
-                type="number"
-                placeholder={`Initial ${poolData.token2 || "Token2"} Liquidity`}
-                value={poolData.initialLiquidity2 || ""}
-                onChange={(e) => handleInputChange(e, "initialLiquidity2")}
-                className="bg-transparent text-zinc-200 w-full outline-none"
-              />
-            </div>
-
-            <div className="flex items-center bg-zinc-900/30 rounded-lg p-3">
-              <FaPercentage className="mr-3 text-zinc-500" />
-              <input
-                type="number"
-                placeholder="Initial APR (%)"
-                value={poolData.initialApr || ""}
-                onChange={(e) => handleInputChange(e, "initialApr")}
-                className="bg-transparent text-zinc-200 w-full outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-4 bg-zinc-900/20 p-6 rounded-lg">
-            <h3 className="text-xl font-semibold text-zinc-300 mb-4">
-              Pool Creation Guidelines
-            </h3>
-            <ul className="text-zinc-500 space-y-2">
-              <li>✓ Tokens must be different</li>
-              <li>✓ Initial liquidity required for both tokens</li>
-              <li>✓ APR must be a valid percentage</li>
-              <li>✓ Verify token availability and compatibility</li>
-            </ul>
+      <div className="max-w-2xl mx-auto bg-white/5 backdrop-blur-sm border border-zinc-800/50 rounded-2xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="px-6 py-4 bg-zinc-900/30 flex justify-between items-center">
+          <h2 className="text-xl font-semibold text-zinc-100 flex items-center">
+            <FaWater className="mr-3 text-zinc-400" />
+            Add Liquidity
+          </h2>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setIsFeeTierModalOpen(true)}
+              className="bg-accent/20 text-accent px-4 py-2 rounded-lg 
+              flex items-center hover:bg-accent/40 transition-colors"
+            >
+              <FaChartLine className="mr-2" />
+              Fee Tier: {selectedFeeTier.label}
+            </button>
+            <Link
+              href="/pools"
+              className="bg-zinc-800 text-zinc-300 px-4 py-2 rounded-lg 
+              flex items-center hover:bg-zinc-700 transition-colors"
+            >
+              Back to Pools
+            </Link>
           </div>
         </div>
 
-        <button
-          onClick={handleCreatePool}
-          className="w-full mt-6 bg-emerald-600 text-white py-3 rounded-lg 
-          hover:bg-emerald-700 transition-colors flex items-center justify-center"
-        >
-          <FaPlus className="mr-2" /> Create Liquidity Pool
-        </button>
-      </motion.div>
+        {/* Liquidity Input Section */}
+        <div className="p-6 space-y-4">
+          {/* First Token Input */}
+          <div className="bg-zinc-900/30 rounded-lg p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => setIsTokenAModalOpen(true)}
+                className="flex items-center bg-zinc-800 rounded-lg px-3 py-2 hover:bg-zinc-700 transition-colors"
+              >
+                <FaCoins className="mr-2 text-zinc-500" />
+                {selectedTokenA ? (
+                  <span className="text-zinc-200">{selectedTokenA.symbol}</span>
+                ) : (
+                  <span className="text-zinc-500">Select Token</span>
+                )}
+                <FaArrowDown className="ml-2 text-zinc-500" />
+              </button>
+              <div className="flex flex-col items-end">
+                <input
+                  type="number"
+                  placeholder="0.0"
+                  value={tokenAAmount}
+                  onChange={(e) => setTokenAAmount(e.target.value)}
+                  className="bg-transparent text-right text-zinc-200 w-full outline-none text-2xl"
+                />
+                <p className="text-zinc-500 text-sm">
+                  amount:{" "}
+                  {selectedTokenA ? selectedTokenA.amount.toFixed(4) : "-"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Plus Icon */}
+          <div className="flex justify-center">
+            <div className="bg-zinc-900/30 p-2 rounded-full">
+              <FaPlus className="text-zinc-500" />
+            </div>
+          </div>
+
+          {/* Second Token Input */}
+          <div className="bg-zinc-900/30 rounded-lg p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <button
+                onClick={() => setIsTokenBModalOpen(true)}
+                className="flex items-center bg-zinc-800 rounded-lg px-3 py-2 hover:bg-zinc-700 transition-colors"
+              >
+                <FaCoins className="mr-2 text-zinc-500" />
+                {selectedTokenB ? (
+                  <span className="text-zinc-200">{selectedTokenB.symbol}</span>
+                ) : (
+                  <span className="text-zinc-500">Select Token</span>
+                )}
+                <FaArrowDown className="ml-2 text-zinc-500" />
+              </button>
+              <div className="flex flex-col items-end">
+                <input
+                  type="number"
+                  placeholder="0.0"
+                  value={tokenBAmount}
+                  onChange={(e) => setTokenBAmount(e.target.value)}
+                  className="bg-transparent text-right text-zinc-200 w-full outline-none text-2xl"
+                />
+                <p className="text-zinc-500 text-sm">
+                  Balance:{" "}
+                  {selectedTokenB ? selectedTokenB.amount.toFixed(4) : "-"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Price Range Section */}
+          <div className="bg-zinc-900/30 rounded-lg p-4 space-y-3">
+            <div className="flex justify-between items-center">
+              <h3 className="text-zinc-300 font-semibold">Price Range</h3>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setPriceRangeType("full")}
+                  className={`
+                    px-3 py-1 rounded-lg transition-colors
+                    ${
+                      priceRangeType === "full"
+                        ? "bg-accent text-background_light"
+                        : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700"
+                    }
+                  `}
+                >
+                  Full Range
+                </button>
+                <button
+                  onClick={() => setPriceRangeType("custom")}
+                  className={`
+                    px-3 py-1 rounded-lg transition-colors
+                    ${
+                      priceRangeType === "custom"
+                        ? "bg-accent text-background_light"
+                        : "bg-zinc-800 text-zinc-500 hover:bg-zinc-700"
+                    }
+                  `}
+                >
+                  Custom Range
+                </button>
+              </div>
+            </div>
+
+            {priceRangeType === "custom" && (
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="bg-zinc-800 rounded-lg p-3">
+                  <label className="text-zinc-500 text-xs mb-1 block">
+                    Minimum Price
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Min Price"
+                    value={minPrice}
+                    onChange={(e) => setMinPrice(e.target.value)}
+                    className="bg-transparent text-zinc-200 w-full outline-none"
+                  />
+                </div>
+                <div className="bg-zinc-800 rounded-lg p-3">
+                  <label className="text-zinc-500 text-xs mb-1 block">
+                    Maximum Price
+                  </label>
+                  <input
+                    type="number"
+                    placeholder="Max Price"
+                    value={maxPrice}
+                    onChange={(e) => setMaxPrice(e.target.value)}
+                    className="bg-transparent text-zinc-200 w-full outline-none"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Deposit Button */}
+          <button
+            onClick={() => {
+              /* Deposit logic */
+            }}
+            disabled={!canDeposit}
+            className={`
+              w-full py-4 rounded-lg transition-colors flex items-center justify-center
+              ${
+                canDeposit
+                  ? "bg-accent text-background_light hover:bg-accent/80"
+                  : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
+              }
+            `}
+          >
+            <FaPlus className="mr-2" />
+            {!selectedTokenA || !selectedTokenB
+              ? "Select Tokens"
+              : "Add Liquidity"}
+          </button>
+        </div>
+      </div>
+
+      {/* Modals */}
+      <TokenSelectionModal
+        tokens={availableTokensA}
+        isOpen={isTokenAModalOpen}
+        onClose={() => setIsTokenAModalOpen(false)}
+        onSelect={(token) => setSelectedTokenA(token)}
+        selectedToken={selectedTokenA}
+      />
+      <TokenSelectionModal
+        tokens={availableTokensB}
+        isOpen={isTokenBModalOpen}
+        onClose={() => setIsTokenBModalOpen(false)}
+        onSelect={(token) => setSelectedTokenB(token)}
+        selectedToken={selectedTokenB}
+      />
+      <FeeTierModal />
     </div>
   );
 };
 
-export default AddPool;
+export default AddLiquidityPool;

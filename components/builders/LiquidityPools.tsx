@@ -123,8 +123,8 @@ const LiquidityPools: React.FC = () => {
             </h2>
             <Link
               href="/add-pool"
-              className="bg-emerald-600/20 text-emerald-400 px-4 py-2 rounded-lg 
-              flex items-center hover:bg-emerald-600/40 transition-colors"
+              className="bg-accent/20 text-accent px-4 py-2 rounded-lg 
+              flex items-center hover:bg-accent/40 transition-colors"
             >
               <FaPlus className="mr-2" /> Add Liquidity
             </Link>
@@ -162,7 +162,7 @@ const LiquidityPools: React.FC = () => {
                     className={`border-b border-zinc-800/30 
                       ${
                         selectedPool === pool.id
-                          ? "bg-emerald-900/20"
+                          ? "bg-accent/10"
                           : "hover:bg-zinc-900/10"
                       } 
                       transition-colors duration-200 cursor-pointer`}
@@ -303,7 +303,7 @@ const LiquidityPools: React.FC = () => {
                   className={`w-full py-3 rounded-lg transition-colors flex items-center justify-center
                     ${
                       canDeposit(getSelectedPoolDetails()?.id || "")
-                        ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                        ? "bg-accent text-white hover:bg-accent/80"
                         : "bg-zinc-800 text-zinc-500 cursor-not-allowed"
                     }`}
                 >
