@@ -2,7 +2,7 @@ import LiquidityPools from "@/components/builders/LiquidityPools";
 
 const page = () => {
   return (
-    <section className="h-screen">
+    <section className="min-h-screen">
       <LiquidityPools />
     </section>
   );

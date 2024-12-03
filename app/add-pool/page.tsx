@@ -3,7 +3,7 @@ import React from "react";
 
 const page = () => {
   return (
-    <section className="h-screen">
+    <section className="min-h-screen">
       <AddLiquidityPool />
     </section>
   );

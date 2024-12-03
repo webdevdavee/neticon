@@ -15,7 +15,8 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 import { formatCurrency, calculatePoolShare } from "@/libs/utils";
-import { DepositAmounts, LiquidityPool, Token } from "@/types";
+import { DepositAmounts, LiquidityPool } from "@/types";
+import PoolBalanceBar from "../ui/PoolBalanceBar";
 
 // Mock Liquidity Pool Data
 const mockLiquidityPools: LiquidityPool[] = [
@@ -57,7 +58,7 @@ const LiquidityPools: React.FC = () => {
   // Handle deposit amount changes
   const handleDepositChange = (
     poolId: string,
-    token: keyof Pick<Token, "symbol" | "amount">,
+    token: "token1" | "token2",
     value: string
   ) => {
     setDepositAmount((prev) => ({
@@ -249,6 +250,21 @@ const LiquidityPools: React.FC = () => {
                 </button>
               </div>
 
+              <div className="mb-6">
+                <PoolBalanceBar
+                  token1={{
+                    symbol:
+                      getSelectedPoolDetails()?.tokens.token1.symbol || "",
+                    amount: getSelectedPoolDetails()?.tokens.token1.amount || 0,
+                  }}
+                  token2={{
+                    symbol:
+                      getSelectedPoolDetails()?.tokens.token2.symbol || "",
+                    amount: getSelectedPoolDetails()?.tokens.token2.amount || 0,
+                  }}
+                />
+              </div>
+
               {/* Deposit Section */}
               <div className="space-y-4">
                 <div className="flex items-center bg-zinc-900/30 rounded-lg p-3">
@@ -266,7 +282,7 @@ const LiquidityPools: React.FC = () => {
                     onChange={(e) =>
                       handleDepositChange(
                         getSelectedPoolDetails()?.id || "",
-                        "amount",
+                        "token1",
                         e.target.value
                       )
                     }
@@ -288,7 +304,7 @@ const LiquidityPools: React.FC = () => {
                     onChange={(e) =>
                       handleDepositChange(
                         getSelectedPoolDetails()?.id || "",
-                        "amount",
+                        "token2",
                         e.target.value
                       )
                     }
