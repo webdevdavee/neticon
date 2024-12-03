@@ -9,11 +9,12 @@ import Modal from "../layouts/Modal";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import Button from "../ui/Button";
 import TextInput from "../ui/Textinput";
+import { Token } from "@/types";
 
-const mockTokens = [
-  { symbol: "ETH", amount: 1.5 },
-  { symbol: "USDT", amount: 1000 },
-  { symbol: "USDC", amount: 1000 },
+const mockTokens: Token[] = [
+  { symbol: "ETH", amount: 1.5, address: "0x...342" },
+  { symbol: "USDT", amount: 1000, address: "0x...564" },
+  { symbol: "USDC", amount: 1000, address: "0x...097" },
 ];
 
 const TokenSwap = ({

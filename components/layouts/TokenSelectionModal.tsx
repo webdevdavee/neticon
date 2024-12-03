@@ -29,7 +29,7 @@ const TokenSelectionModal: React.FC<Props> = ({
     return tokens.filter(
       (token) =>
         token.symbol.toLowerCase().includes(lowercaseQuery) ||
-        token.amount.toString().includes(lowercaseQuery)
+        token.address?.toString().includes(lowercaseQuery)
     );
   }, [tokens, searchQuery]);
 

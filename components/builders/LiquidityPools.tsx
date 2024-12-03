@@ -370,10 +370,7 @@ const LiquidityPools: React.FC = () => {
             selectedPool
               ? {
                   symbol: getSelectedPoolDetails()?.tokens.token1.symbol || "",
-                  name: getSelectedPoolDetails()?.tokens.token1.symbol || "",
-                  balance:
-                    getSelectedPoolDetails()?.tokens.token1.amount.toString() ||
-                    "0",
+                  amount: getSelectedPoolDetails()?.tokens.token1.amount || 0,
                   address: "0x...",
                 }
               : undefined
@@ -382,10 +379,7 @@ const LiquidityPools: React.FC = () => {
             selectedPool
               ? {
                   symbol: getSelectedPoolDetails()?.tokens.token2.symbol || "",
-                  name: getSelectedPoolDetails()?.tokens.token2.symbol || "",
-                  balance:
-                    getSelectedPoolDetails()?.tokens.token2.amount.toString() ||
-                    "0",
+                  amount: getSelectedPoolDetails()?.tokens.token2.amount || 0,
                   address: "0x...",
                 }
               : undefined
