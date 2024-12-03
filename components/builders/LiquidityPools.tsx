@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   FaWater,
@@ -17,6 +17,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { formatCurrency, calculatePoolShare } from "@/libs/utils";
 import { DepositAmounts, LiquidityPool } from "@/types";
 import PoolBalanceBar from "../ui/PoolBalanceBar";
+import Modal from "../layouts/Modal";
+import TokenSwap from "./TokenSwap";
 
 // Mock Liquidity Pool Data
 const mockLiquidityPools: LiquidityPool[] = [
@@ -47,8 +49,10 @@ const mockLiquidityPools: LiquidityPool[] = [
 ];
 
 const LiquidityPools: React.FC = () => {
-  const [selectedPool, setSelectedPool] = useState<string | null>(null);
-  const [depositAmount, setDepositAmount] = useState<DepositAmounts>({});
+  const [selectedPool, setSelectedPool] = React.useState<string | null>(null);
+  const [depositAmount, setDepositAmount] = React.useState<DepositAmounts>({});
+
+  const [showTokenSwapModal, setShowTokenSwapModal] = React.useState(false);
 
   // Find selected pool details
   const getSelectedPoolDetails = (): LiquidityPool | undefined => {
@@ -242,12 +246,22 @@ const LiquidityPools: React.FC = () => {
                 <h3 className="text-xl font-semibold text-zinc-300">
                   Pool Details
                 </h3>
-                <button
-                  onClick={() => setSelectedPool(null)}
-                  className="text-zinc-500 hover:text-zinc-300"
-                >
-                  <FaTimes />
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => setShowTokenSwapModal(true)}
+                    className="text-zinc-500 hover:text-accent transition-colors"
+                    title="Swap Tokens"
+                  >
+                    <FaExchangeAlt className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setSelectedPool(null)}
+                    className="text-zinc-500 hover:text-zinc-300"
+                    title="Close"
+                  >
+                    <FaTimes />
+                  </button>
+                </div>
               </div>
 
               <div className="mb-6">
@@ -347,6 +361,37 @@ const LiquidityPools: React.FC = () => {
           )}
         </AnimatePresence>
       </div>
+      <Modal
+        isOpen={showTokenSwapModal}
+        onClose={() => setShowTokenSwapModal(false)}
+      >
+        <TokenSwap
+          initialFromToken={
+            selectedPool
+              ? {
+                  symbol: getSelectedPoolDetails()?.tokens.token1.symbol || "",
+                  name: getSelectedPoolDetails()?.tokens.token1.symbol || "",
+                  balance:
+                    getSelectedPoolDetails()?.tokens.token1.amount.toString() ||
+                    "0",
+                  address: "0x...",
+                }
+              : undefined
+          }
+          initialToToken={
+            selectedPool
+              ? {
+                  symbol: getSelectedPoolDetails()?.tokens.token2.symbol || "",
+                  name: getSelectedPoolDetails()?.tokens.token2.symbol || "",
+                  balance:
+                    getSelectedPoolDetails()?.tokens.token2.amount.toString() ||
+                    "0",
+                  address: "0x...",
+                }
+              : undefined
+          }
+        />
+      </Modal>
     </div>
   );
 };

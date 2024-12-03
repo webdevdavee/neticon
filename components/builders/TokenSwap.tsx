@@ -15,7 +15,13 @@ const mockTokens = [
   { symbol: "USDC", name: "USD Coin", balance: "1000", address: "0x...3" },
 ];
 
-const TokenSwap = () => {
+const TokenSwap = ({
+  initialFromToken,
+  initialToToken,
+}: {
+  initialFromToken?: (typeof mockTokens)[0];
+  initialToToken?: (typeof mockTokens)[0];
+}) => {
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [activeField, setActiveField] = useState<"from" | "to" | null>(null);
@@ -23,8 +29,8 @@ const TokenSwap = () => {
   const [slippage, setSlippage] = useState("0.5");
   const [fromAmount, setFromAmount] = useState("");
   const [selectedTokens, setSelectedTokens] = useState({
-    from: mockTokens[0],
-    to: mockTokens[1],
+    from: initialFromToken || mockTokens[0],
+    to: initialToToken || mockTokens[1],
   });
 
   const handleTokenSelect = (token: (typeof mockTokens)[0]) => {
