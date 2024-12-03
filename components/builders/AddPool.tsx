@@ -8,11 +8,11 @@ import {
   FaPlus,
   FaArrowDown,
   FaChartLine,
-  FaTimes,
 } from "react-icons/fa";
-import { motion } from "framer-motion";
 
 import { Token } from "@/types";
+import TokenSelectionModal from "../layouts/TokenSelectionModal";
+import FeeTierModal from "../layouts/FeeTierModal";
 
 // Fee Tiers typical in DEXs
 const FEE_TIERS = [
@@ -78,165 +78,38 @@ const AddLiquidityPool: React.FC = () => {
   ]);
 
   // Handle deposit submission
-  const handleDeposit = () => {
-    if (!canDeposit) {
-      alert("Please check your token selections, amounts, and price range");
-      return;
-    }
+  //   const handleDeposit = () => {
+  //     if (!canDeposit) {
+  //       alert("Please check your token selections, amounts, and price range");
+  //       return;
+  //     }
 
-    // Simulated deposit logic
-    console.log("Depositing Liquidity", {
-      tokenA: {
-        symbol: selectedTokenA?.symbol,
-        amount: parseFloat(tokenAAmount),
-      },
-      tokenB: {
-        symbol: selectedTokenB?.symbol,
-        amount: parseFloat(tokenBAmount),
-      },
-      feeTier: selectedFeeTier,
-      priceRange:
-        priceRangeType === "full" ? "Full Range" : `${minPrice} - ${maxPrice}`,
-    });
-  };
+  //     // Simulated deposit logic
+  //     console.log("Depositing Liquidity", {
+  //       tokenA: {
+  //         symbol: selectedTokenA?.symbol,
+  //         amount: parseFloat(tokenAAmount),
+  //       },
+  //       tokenB: {
+  //         symbol: selectedTokenB?.symbol,
+  //         amount: parseFloat(tokenBAmount),
+  //       },
+  //       feeTier: selectedFeeTier,
+  //       priceRange:
+  //         priceRangeType === "full" ? "Full Range" : `${minPrice} - ${maxPrice}`,
+  //     });
+  //   };
 
-  // Token selection handler
-  const handleTokenSelect = (token: Token, isTokenA: boolean) => {
-    if (isTokenA) {
-      setSelectedTokenA(token);
-      setIsTokenAModalOpen(false);
-    } else {
-      setSelectedTokenB(token);
-      setIsTokenBModalOpen(false);
-    }
-  };
-
-  // Token selection modal component
-  const TokenSelectionModal = ({
-    tokens,
-    isOpen,
-    onClose,
-    onSelect,
-    selectedToken,
-  }: {
-    tokens: Token[];
-    isOpen: boolean;
-    onClose: () => void;
-    onSelect: (token: Token) => void;
-    selectedToken: Token | null;
-  }) => {
-    if (!isOpen) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      >
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          className="bg-zinc-900 w-96 rounded-2xl border border-zinc-800/50 shadow-2xl"
-        >
-          <div className="px-6 py-4 bg-zinc-900/30 flex justify-between items-center">
-            <h3 className="text-xl font-semibold text-zinc-100">
-              Select Token
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-zinc-500 hover:text-zinc-300"
-            >
-              <FaTimes />
-            </button>
-          </div>
-
-          <div className="p-4 max-h-96 overflow-y-auto">
-            {tokens.map((token) => (
-              <button
-                key={token.symbol}
-                onClick={() => onSelect(token)}
-                className={`
-                  w-full flex items-center justify-between p-3 rounded-lg mb-2 
-                  ${
-                    selectedToken === token
-                      ? "bg-accent/20"
-                      : "hover:bg-zinc-800"
-                  }
-                  transition-colors
-                `}
-              >
-                <div className="flex items-center">
-                  <FaCoins className="mr-3 text-zinc-500" />
-                  <div className="text-left">
-                    <p className="text-zinc-200 font-medium">{token.symbol}</p>
-                    <p className="text-xs text-zinc-500">{token.symbol}</p>
-                  </div>
-                </div>
-                <span className="text-zinc-400">{token.amount.toFixed(4)}</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-      </motion.div>
-    );
-  };
-
-  // Fee Tier Selection Modal
-  const FeeTierModal = () => {
-    if (!isFeeTierModalOpen) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-      >
-        <motion.div
-          initial={{ scale: 0.9 }}
-          animate={{ scale: 1 }}
-          className="bg-zinc-900 w-96 rounded-2xl border border-zinc-800/50 shadow-2xl"
-        >
-          <div className="px-6 py-4 bg-zinc-900/30 flex justify-between items-center">
-            <h3 className="text-xl font-semibold text-zinc-100">
-              Select Fee Tier
-            </h3>
-            <button
-              onClick={() => setIsFeeTierModalOpen(false)}
-              className="text-zinc-500 hover:text-zinc-300"
-            >
-              <FaTimes />
-            </button>
-          </div>
-
-          <div className="p-4 space-y-2">
-            {FEE_TIERS.map((tier) => (
-              <button
-                key={tier.value}
-                onClick={() => {
-                  setSelectedFeeTier(tier);
-                  setIsFeeTierModalOpen(false);
-                }}
-                className={`
-                  w-full flex items-center justify-between p-3 rounded-lg 
-                  ${
-                    selectedFeeTier.value === tier.value
-                      ? "bg-accent/20"
-                      : "hover:bg-zinc-800"
-                  }
-                  transition-colors
-                `}
-              >
-                <div>
-                  <p className="text-zinc-200 font-medium">{tier.label}</p>
-                </div>
-                <span className="text-zinc-400">{tier.value}%</span>
-              </button>
-            ))}
-          </div>
-        </motion.div>
-      </motion.div>
-    );
-  };
+  //   // Token selection handler
+  //   const handleTokenSelect = (token: Token, isTokenA: boolean) => {
+  //     if (isTokenA) {
+  //       setSelectedTokenA(token);
+  //       setIsTokenAModalOpen(false);
+  //     } else {
+  //       setSelectedTokenB(token);
+  //       setIsTokenBModalOpen(false);
+  //     }
+  //   };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -439,7 +312,13 @@ const AddLiquidityPool: React.FC = () => {
         onSelect={(token) => setSelectedTokenB(token)}
         selectedToken={selectedTokenB}
       />
-      <FeeTierModal />
+      <FeeTierModal
+        isFeeTierModalOpen={isFeeTierModalOpen}
+        setIsFeeTierModalOpen={setIsFeeTierModalOpen}
+        FEE_TIERS={FEE_TIERS}
+        setSelectedFeeTier={setSelectedFeeTier}
+        selectedFeeTier={selectedFeeTier}
+      />
     </div>
   );
 };
