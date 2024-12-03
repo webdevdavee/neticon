@@ -9,6 +9,7 @@ import {
   FaExchangeAlt,
   FaLayerGroup,
   FaPaintBrush,
+  FaFaucet,
 } from "react-icons/fa";
 
 const Navbar = () => {
@@ -32,6 +33,7 @@ const Navbar = () => {
           <ul className="flex items-center gap-8">
             <NavLink href="/swap" icon={<FaExchangeAlt />} label="Swap" />
             <NavLink href="/pools" icon={<FaLayerGroup />} label="Liquidity" />
+            <NavLink href="/faucet" icon={<FaFaucet />} label="Faucet" />
             <NavLink
               href="https://hazee.vercel.app/"
               icon={<FaPaintBrush />}
@@ -51,7 +53,7 @@ const Navbar = () => {
   );
 };
 
-// Helper component for navigation links
+// Component for navigation links
 const NavLink: React.FC<{
   href: string;
   icon: React.ReactNode;
