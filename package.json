@@ -12,6 +12,7 @@
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
     "chart.js": "^4.4.6",
+    "ethers": "^6.13.4",
     "framer-motion": "^11.11.17",
     "next": "15.0.3",
     "react": "^18.3.1",
@@ -27,6 +28,7 @@
     "@types/react-dom": "^18.3.1",
     "eslint": "^8",
     "eslint-config-next": "15.0.3",
+    "hardhat": "^2.22.17",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
