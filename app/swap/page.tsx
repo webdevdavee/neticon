@@ -1,5 +1,11 @@
 import TokenSwap from "@/components/builders/TokenSwap";
+import { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Swap crypto on Neticon",
+  description: "Swap Crypto Effortlessly",
+};
 
 const page = () => {
   return (

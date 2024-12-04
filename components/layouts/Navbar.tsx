@@ -10,7 +10,9 @@ import {
   FaLayerGroup,
   FaPaintBrush,
   FaFaucet,
+  FaCoins,
 } from "react-icons/fa";
+
 import WalletConnectModal from "./WalletConnectModal";
 
 const Navbar = () => {
@@ -47,6 +49,7 @@ const Navbar = () => {
                 icon={<FaLayerGroup />}
                 label="Liquidity"
               />
+              <NavLink href="/staking" icon={<FaCoins />} label="Staking" />
               <NavLink href="/faucet" icon={<FaFaucet />} label="Faucet" />
               <NavLink
                 href="https://hazee.vercel.app/"
@@ -93,18 +96,16 @@ const NavLink: React.FC<{
         href={href}
         target={external ? "_blank" : undefined}
         rel={external ? "noopener noreferrer" : undefined}
-        className={`flex items-center gap-2 transition-colors 
-                    duration-300 group text-sm
-                    ${
-                      isActive
-                        ? "text-accent"
-                        : "text-zinc-400 hover:text-zinc-100"
-                    }`}
+        className={`flex items-center gap-2 transition-colors                      
+          duration-300 group text-sm                     
+          ${isActive ? "text-accent" : "text-zinc-400 hover:text-zinc-100"}`}
       >
         <span
-          className={`
-          ${isActive ? "text-accent" : "group-hover:text-accent text-zinc-500"}
-          transition-colors`}
+          className={`           
+            ${
+              isActive ? "text-accent" : "group-hover:text-accent text-zinc-500"
+            }           
+            transition-colors`}
         >
           {icon}
         </span>
