@@ -27,7 +27,7 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
     // Total LP tokens staked
     uint256 public totalStaked;
 
-    constructor(IERC20 _lpToken, IERC20 _governanceToken) {
+    constructor(IERC20 _lpToken, IERC20 _governanceToken) Ownable(msg.sender) {
         lpToken = _lpToken;
         governanceToken = _governanceToken;
     }
@@ -35,27 +35,27 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
     // Stake LP tokens
     function stake(uint256 amount) external nonReentrant {
         require(amount > 0, "Cannot stake zero");
-        
+
         // Transfer LP tokens from user
         require(
-            lpToken.transferFrom(msg.sender, address(this), amount), 
+            lpToken.transferFrom(msg.sender, address(this), amount),
             "LP token transfer failed"
         );
 
         // Update user's stake
         StakeInfo storage userStake = stakes[msg.sender];
-        
+
         // Calculate and add any pending rewards before updating stake
         if (userStake.amount > 0) {
             userStake.unclaimedRewards += _calculateRewards(
-                userStake.amount, 
+                userStake.amount,
                 userStake.lastStakeTime
             );
         }
 
         userStake.amount += amount;
         userStake.lastStakeTime = block.timestamp;
-        
+
         // Update total staked
         totalStaked += amount;
     }
@@ -63,15 +63,12 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
     // Unstake LP tokens
     function unstake(uint256 amount) external nonReentrant {
         StakeInfo storage userStake = stakes[msg.sender];
-        
-        require(
-            userStake.amount >= amount, 
-            "Insufficient staked amount"
-        );
+
+        require(userStake.amount >= amount, "Insufficient staked amount");
 
         // Calculate rewards
         userStake.unclaimedRewards += _calculateRewards(
-            userStake.amount, 
+            userStake.amount,
             userStake.lastStakeTime
         );
 
@@ -82,7 +79,7 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
 
         // Return LP tokens to user
         require(
-            lpToken.transfer(msg.sender, amount), 
+            lpToken.transfer(msg.sender, amount),
             "LP token transfer failed"
         );
     }
@@ -90,14 +87,11 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
     // Claim governance token rewards
     function claimRewards() external nonReentrant {
         StakeInfo storage userStake = stakes[msg.sender];
-        
+
         // Calculate current rewards
-        uint256 rewards = userStake.unclaimedRewards + 
-            _calculateRewards(
-                userStake.amount, 
-                userStake.lastStakeTime
-            );
-        
+        uint256 rewards = userStake.unclaimedRewards +
+            _calculateRewards(userStake.amount, userStake.lastStakeTime);
+
         require(rewards > 0, "No rewards to claim");
 
         // Reset unclaimed rewards and update stake time
@@ -113,7 +107,7 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
 
     // Internal function to calculate rewards
     function _calculateRewards(
-        uint256 stakedAmount, 
+        uint256 stakedAmount,
         uint256 lastStakeTime
     ) internal view returns (uint256) {
         uint256 stakeDuration = block.timestamp - lastStakeTime;
@@ -122,7 +116,7 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
 
     // Allow owner to update reward rates or tokens if needed
     function updateRewardConfiguration(
-        uint256 newRewardRate, 
+        uint256 newRewardRate,
         IERC20 newGovernanceToken
     ) external onlyOwner {
         // Implementation for updating reward parameters

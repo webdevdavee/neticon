@@ -12,12 +12,12 @@ contract TokenFaucet is Ownable {
     uint256 public constant COOLDOWN_PERIOD = 1 hours;
 
     // Maximum tokens that can be requested
-    uint256 public constant MAX_REQUEST_AMOUNT = 1000 * 10**18;
+    uint256 public constant MAX_REQUEST_AMOUNT = 1000 * 10 ** 18;
 
     // Supported test tokens
     ERC20 public testToken;
 
-    constructor(ERC20 _testToken) {
+    constructor(ERC20 _testToken) Ownable(msg.sender) {
         testToken = _testToken;
     }
 
@@ -29,7 +29,7 @@ contract TokenFaucet is Ownable {
         );
 
         lastRequestTime[msg.sender] = block.timestamp;
-        
+
         testToken.transfer(msg.sender, MAX_REQUEST_AMOUNT);
     }
 

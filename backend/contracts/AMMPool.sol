@@ -14,10 +14,10 @@ contract AMMPool is ReentrancyGuard, Ownable {
     LPToken public lpToken;
 
     enum FeeTier {
-        STABLE,       // 0.01%
+        STABLE, // 0.01%
         LOW_VOLATILITY, // 0.05%
-        STANDARD,     // 0.3%
-        EXOTIC        // 1%
+        STANDARD, // 0.3%
+        EXOTIC // 1%
     }
 
     // Pool config
@@ -25,7 +25,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
     IERC20 public tokenB;
     address public factory;
     FeeTier public feeTier;
-    
+
     // Enhanced Pool Metrics
     uint256 public totalValueLocked;
     uint256 public volumeLast24h;
@@ -36,15 +36,15 @@ contract AMMPool is ReentrancyGuard, Ownable {
     uint256 public reserveA;
     uint256 public reserveB;
     uint256 public totalLiquidity;
-    
+
     // Price range configuration
     uint256 public lowerTick;
     uint256 public upperTick;
-    
+
     // Fee tracking
     uint256 public feesToken0;
     uint256 public feesToken1;
-    
+
     // Liquidity position tracking
     mapping(address => LiquidityPosition[]) public userPositions;
     mapping(address => bool) public hasProvidedLiquidity;
@@ -62,18 +62,18 @@ contract AMMPool is ReentrancyGuard, Ownable {
     }
 
     event LiquidityAdded(
-        address indexed provider, 
-        uint256 amountA, 
-        uint256 amountB, 
+        address indexed provider,
+        uint256 amountA,
+        uint256 amountB,
         uint256 liquidityMinted,
         uint256 lowerTick,
         uint256 upperTick
     );
 
     event LiquidityRemoved(
-        address indexed provider, 
-        uint256 amountA, 
-        uint256 amountB, 
+        address indexed provider,
+        uint256 amountA,
+        uint256 amountB,
         uint256 liquidityBurned
     );
 
@@ -84,18 +84,15 @@ contract AMMPool is ReentrancyGuard, Ownable {
     );
 
     event Swap(
-        address indexed sender, 
-        address indexed tokenIn, 
-        address indexed tokenOut, 
-        uint256 amountIn, 
+        address indexed sender,
+        address indexed tokenIn,
+        address indexed tokenOut,
+        uint256 amountIn,
         uint256 amountOut,
         uint256 feeAmount
     );
 
-    event VolumeReset(
-        uint256 volumeLast24h,
-        uint256 timestamp
-    );
+    event VolumeReset(uint256 volumeLast24h, uint256 timestamp);
 
     event PoolInitialized(
         address tokenA,
@@ -105,14 +102,14 @@ contract AMMPool is ReentrancyGuard, Ownable {
         FeeTier _feeTier
     );
 
-    constructor() {
+    constructor() Ownable(msg.sender) {
         // Prevent direct initialization of this contract
         initialized = true;
     }
 
     // Initialization function for clone factories
     function initialize(
-        IERC20 _tokenA, 
+        IERC20 _tokenA,
         IERC20 _tokenB,
         uint256 _lowerTick,
         uint256 _upperTick,
@@ -122,13 +119,27 @@ contract AMMPool is ReentrancyGuard, Ownable {
         require(!initialized, "Pool already initialized");
         require(_lowerTick < _upperTick, "Invalid price range");
 
-        // Set initialization flag
+        // Set initialization flagsoli
         initialized = true;
 
         // Create LP Token for this pool
         lpToken = new LPToken(
-            string(abi.encodePacked("LP-", _tokenA.symbol(), "-", _tokenB.symbol())),
-            string(abi.encodePacked("LP_", _tokenA.symbol(), "_", _tokenB.symbol())),
+            string(
+                abi.encodePacked(
+                    "LP-",
+                    ERC20(address(_tokenA)).symbol(),
+                    "-",
+                    ERC20(address(_tokenB)).symbol()
+                )
+            ),
+            string(
+                abi.encodePacked(
+                    "LP_",
+                    ERC20(address(_tokenA)).symbol(),
+                    "_",
+                    ERC20(address(_tokenB)).symbol()
+                )
+            ),
             address(this)
         );
 
@@ -145,21 +156,21 @@ contract AMMPool is ReentrancyGuard, Ownable {
         _transferOwnership(msg.sender);
 
         emit PoolInitialized(
-            address(_tokenA), 
-            address(_tokenB), 
-            _lowerTick, 
+            address(_tokenA),
+            address(_tokenB),
+            _lowerTick,
             _upperTick,
             _feeTier
         );
     }
 
     function depositLiquidity(
-        uint256 amountA, 
+        uint256 amountA,
         uint256 amountB
     ) external nonReentrant returns (uint256 liquidityMinted) {
         // Validate initialization
         require(initialized, "Pool not initialized");
-        
+
         // Validate input amounts
         require(amountA > 0 && amountB > 0, "Amounts must be greater than 0");
 
@@ -186,10 +197,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
         if (totalLiquidity == 0) {
             // Initial liquidity calculation with stricter requirements
             liquidityMinted = _sqrt(amountA * amountB);
-            require(
-                liquidityMinted > 10000, 
-                "Insufficient initial liquidity"
-            );
+            require(liquidityMinted > 10000, "Insufficient initial liquidity");
 
             // Permanently lock minimum liquidity
             totalLiquidity = 10000;
@@ -228,15 +236,15 @@ contract AMMPool is ReentrancyGuard, Ownable {
         totalValueLocked += depositValue;
 
         emit LiquidityAdded(
-            msg.sender, 
-            amountA, 
-            amountB, 
+            msg.sender,
+            amountA,
+            amountB,
             liquidityMinted,
             lowerTick,
             upperTick
         );
 
-         // Mint LP tokens to the depositor
+        // Mint LP tokens to the depositor
         lpToken.mint(msg.sender, liquidityMinted);
 
         return liquidityMinted;
@@ -250,7 +258,10 @@ contract AMMPool is ReentrancyGuard, Ownable {
 
         // Track total user liquidity
         uint256 totalUserLiquidity = _calculateTotalUserLiquidity(msg.sender);
-        require(liquidityToRemove <= totalUserLiquidity, "Cannot remove more liquidity than provided");
+        require(
+            liquidityToRemove <= totalUserLiquidity,
+            "Cannot remove more liquidity than provided"
+        );
 
         // Advanced position management
         LiquidityPosition[] storage positions = userPositions[msg.sender];
@@ -263,13 +274,18 @@ contract AMMPool is ReentrancyGuard, Ownable {
 
             LiquidityPosition storage position = positions[i];
             uint256 positionLiquidity = position.liquidityProvided;
-            
+
             if (positionLiquidity > 0) {
-                uint256 liquidityToUse = Math.min(positionLiquidity, remainingToRemove);
-                
+                uint256 liquidityToUse = Math.min(
+                    positionLiquidity,
+                    remainingToRemove
+                );
+
                 // Proportional amount calculation with more precise math
-                uint256 proportionalAmountA = (reserveA * liquidityToUse) / totalLiquidity;
-                uint256 proportionalAmountB = (reserveB * liquidityToUse) / totalLiquidity;
+                uint256 proportionalAmountA = (reserveA * liquidityToUse) /
+                    totalLiquidity;
+                uint256 proportionalAmountB = (reserveB * liquidityToUse) /
+                    totalLiquidity;
 
                 totalAmountA += proportionalAmountA;
                 totalAmountB += proportionalAmountB;
@@ -297,13 +313,19 @@ contract AMMPool is ReentrancyGuard, Ownable {
         totalValueLocked -= withdrawalValue;
 
         // Transfer tokens back to user
-        require(tokenA.transfer(msg.sender, totalAmountA), "TokenA transfer failed");
-        require(tokenB.transfer(msg.sender, totalAmountB), "TokenB transfer failed");
+        require(
+            tokenA.transfer(msg.sender, totalAmountA),
+            "TokenA transfer failed"
+        );
+        require(
+            tokenB.transfer(msg.sender, totalAmountB),
+            "TokenB transfer failed"
+        );
 
         emit LiquidityRemoved(
-            msg.sender, 
-            totalAmountA, 
-            totalAmountB, 
+            msg.sender,
+            totalAmountA,
+            totalAmountB,
             liquidityToRemove
         );
 
@@ -314,33 +336,42 @@ contract AMMPool is ReentrancyGuard, Ownable {
     }
 
     // New function to calculate total user liquidity
-    function _calculateTotalUserLiquidity(address user) internal view returns (uint256 totalLiquidity) {
+    function _calculateTotalUserLiquidity(
+        address user
+    ) internal view returns (uint256 userTotalLiquidity) {
         LiquidityPosition[] storage positions = userPositions[user];
+        uint256 liquiditySum;
         for (uint256 i = 0; i < positions.length; i++) {
-            totalLiquidity += positions[i].liquidityProvided;
+            liquiditySum += positions[i].liquidityProvided;
         }
-        return totalLiquidity;
+        return liquiditySum;
     }
 
     // Swap tokens
     function swap(
-        IERC20 tokenIn, 
-        IERC20 tokenOut, 
+        IERC20 tokenIn,
+        IERC20 tokenOut,
         uint256 amountIn
     ) external nonReentrant returns (uint256 amountOut) {
         require(initialized, "Pool not initialized");
         require(amountIn > 0, "Invalid input amount");
 
         // Fee calculation with more flexible tier system
-        uint256 feeTier = _calculateFeeTier(amountIn);
-        uint256 feeAmount = (amountIn * feeTier) / 10000;
+        uint256 feePercentage = _calculateFeeTier();
+        uint256 feeAmount = (amountIn * feePercentage) / 10000;
         uint256 amountInAfterFee = amountIn - feeAmount;
 
-       // Determine reserves and calculate swap
-        uint256 reserveIn = address(tokenIn) == address(tokenA) ? reserveA : reserveB;
-        uint256 reserveOut = address(tokenIn) == address(tokenA) ? reserveB : reserveA;
+        // Determine reserves and calculate swap
+        uint256 reserveIn = address(tokenIn) == address(tokenA)
+            ? reserveA
+            : reserveB;
+        uint256 reserveOut = address(tokenIn) == address(tokenA)
+            ? reserveB
+            : reserveA;
 
-        amountOut = (reserveOut * amountInAfterFee) / (reserveIn + amountInAfterFee);
+        amountOut =
+            (reserveOut * amountInAfterFee) /
+            (reserveIn + amountInAfterFee);
 
         // Validate price range
         _validateSwapPriceRange(amountIn, amountOut);
@@ -378,10 +409,10 @@ contract AMMPool is ReentrancyGuard, Ownable {
         }
 
         emit Swap(
-            msg.sender, 
-            address(tokenIn), 
-            address(tokenOut), 
-            amountIn, 
+            msg.sender,
+            address(tokenIn),
+            address(tokenOut),
+            amountIn,
             amountOut,
             feeAmount
         );
@@ -393,35 +424,38 @@ contract AMMPool is ReentrancyGuard, Ownable {
     }
 
     // Price range validation for deposits
-    function _validatePriceRange(uint256 amountA, uint256 amountB) internal view {
+    function _validatePriceRange(
+        uint256 amountA,
+        uint256 amountB
+    ) internal view {
         require(initialized, "Pool not initialized");
-        
-        // Prevent division by zero
+        require(amountA > 0, "Invalid amount A");
         require(amountB > 0, "Invalid amount B");
-        
+
         // Calculate current price with 18 decimal precision
         uint256 currentPrice = (amountA * 1e18) / amountB;
-        
+
         require(
-            currentPrice >= lowerTick && 
-            currentPrice <= upperTick, 
+            currentPrice >= lowerTick && currentPrice <= upperTick,
             "Deposit outside allowed price range"
         );
     }
 
     // Price range validation for swaps
-    function _validateSwapPriceRange(uint256 amountIn, uint256 amountOut) internal view {
+    function _validateSwapPriceRange(
+        uint256 amountIn,
+        uint256 amountOut
+    ) internal view {
         require(initialized, "Pool not initialized");
-        
+
         // Prevent division by zero
         require(amountOut > 0, "Invalid amount out");
-        
+
         // Calculate swap price with 18 decimal precision
         uint256 swapPrice = (amountIn * 1e18) / amountOut;
-        
+
         require(
-            swapPrice >= lowerTick && 
-            swapPrice <= upperTick, 
+            swapPrice >= lowerTick && swapPrice <= upperTick,
             "Swap outside allowed price range"
         );
     }
@@ -433,27 +467,31 @@ contract AMMPool is ReentrancyGuard, Ownable {
         if (feeTier == FeeTier.LOW_VOLATILITY) return 5; // 0.05%
         if (feeTier == FeeTier.STANDARD) return 30; // 0.3%
         if (feeTier == FeeTier.EXOTIC) return 100; // 1%
-        
+
         return 30; // Default to standard tier
     }
 
-
-    function getPoolMetrics() external view returns (
-        uint256 _totalValueLocked,
-        uint256 _volumeLast24h,
-        uint256 _volumeAllTime,
-        uint256 _activeUserCount,
-        uint256 _reserveA,
-        uint256 _reserveB,
-        uint256 _feesToken0,
-        uint256 _feesToken1,
-        uint256 _apr
-    ) {
+    function getPoolMetrics()
+        external
+        view
+        returns (
+            uint256 _totalValueLocked,
+            uint256 _volumeLast24h,
+            uint256 _volumeAllTime,
+            uint256 _activeUserCount,
+            uint256 _reserveA,
+            uint256 _reserveB,
+            uint256 _feesToken0,
+            uint256 _feesToken1,
+            uint256 _apr
+        )
+    {
         // Prorated APR calculation
         uint256 feesGenerated = feesToken0 + feesToken1;
         uint256 timeSinceLastReset = block.timestamp - lastVolumeResetTimestamp;
-        uint256 apr = totalValueLocked > 0 
-            ? (feesGenerated * (365 days / timeSinceLastReset) * 100) / totalValueLocked
+        uint256 apr = totalValueLocked > 0
+            ? (feesGenerated * (365 days / timeSinceLastReset) * 100) /
+                totalValueLocked
             : 0;
 
         return (
@@ -483,14 +521,16 @@ contract AMMPool is ReentrancyGuard, Ownable {
     }
 
     function _calculateLiquidityMinted(
-        uint256 reserveA,
-        uint256 reserveB,
-        uint256 totalLiquidity,
+        uint256 _currentReserveA,
+        uint256 _currentReserveB,
+        uint256 _currentTotalLiquidity,
         uint256 amountA,
         uint256 amountB
     ) internal pure returns (uint256) {
-        uint256 liquidityA = (amountA * totalLiquidity) / reserveA;
-        uint256 liquidityB = (amountB * totalLiquidity) / reserveB;
+        uint256 liquidityA = (amountA * _currentTotalLiquidity) /
+            _currentReserveA;
+        uint256 liquidityB = (amountB * _currentTotalLiquidity) /
+            _currentReserveB;
         return liquidityA < liquidityB ? liquidityA : liquidityB;
     }
 }

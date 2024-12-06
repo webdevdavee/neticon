@@ -8,10 +8,10 @@ contract LPToken is ERC20, Ownable {
     address public immutable pool;
 
     constructor(
-        string memory name, 
-        string memory symbol, 
+        string memory name,
+        string memory symbol,
         address _pool
-    ) ERC20(name, symbol) {
+    ) ERC20(name, symbol) Ownable(msg.sender) {
         pool = _pool;
     }
 
