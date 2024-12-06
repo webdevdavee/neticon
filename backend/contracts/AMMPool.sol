@@ -10,15 +10,18 @@ import "./LPToken.sol";
 contract AMMPool is ReentrancyGuard, Ownable {
     using Math for uint256;
 
-    // LP Token for this pool
-    LPToken public lpToken;
-
     enum FeeTier {
         STABLE, // 0.01%
         LOW_VOLATILITY, // 0.05%
         STANDARD, // 0.3%
         EXOTIC // 1%
     }
+
+    // Minimum liquidity constant
+    uint256 private constant MINIMUM_LIQUIDITY = 10000;
+
+    // LP Token for this pool
+    LPToken public lpToken;
 
     // Pool config
     IERC20 public tokenA;
@@ -193,17 +196,20 @@ contract AMMPool is ReentrancyGuard, Ownable {
             activeUserCount++;
         }
 
-        // First liquidity deposit with more robust initialization
+        // First liquidity deposit
         if (totalLiquidity == 0) {
-            // Initial liquidity calculation with stricter requirements
+            // Initial liquidity calculation
             liquidityMinted = _sqrt(amountA * amountB);
-            require(liquidityMinted > 10000, "Insufficient initial liquidity");
+            require(
+                liquidityMinted > MINIMUM_LIQUIDITY,
+                "Insufficient initial liquidity"
+            );
 
             // Permanently lock minimum liquidity
-            totalLiquidity = 10000;
-            liquidityMinted -= 10000;
+            totalLiquidity = MINIMUM_LIQUIDITY;
+            liquidityMinted -= MINIMUM_LIQUIDITY;
         } else {
-            // Subsequent liquidity deposits with optimized calculations
+            // Subsequent liquidity deposits
             liquidityMinted = _calculateLiquidityMinted(
                 reserveA,
                 reserveB,
@@ -213,7 +219,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
             );
         }
 
-        // Advanced liquidity position tracking
+        // Liquidity position tracking
         LiquidityPosition memory newPosition = LiquidityPosition({
             amountA: amountA,
             amountB: amountB,
@@ -223,7 +229,6 @@ contract AMMPool is ReentrancyGuard, Ownable {
             upperTick: upperTick
         });
 
-        // Use push with memory to optimize gas
         userPositions[msg.sender].push(newPosition);
 
         // Update pool reserves
@@ -231,7 +236,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
         reserveB += amountB;
         totalLiquidity += liquidityMinted;
 
-        // Update Total Value Locked with more precise calculation
+        // Update Total Value Locked
         uint256 depositValue = (amountA + amountB);
         totalValueLocked += depositValue;
 
@@ -263,7 +268,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
             "Cannot remove more liquidity than provided"
         );
 
-        // Advanced position management
+        // Position management
         LiquidityPosition[] storage positions = userPositions[msg.sender];
         uint256 remainingToRemove = liquidityToRemove;
         uint256 totalAmountA;
@@ -281,7 +286,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
                     remainingToRemove
                 );
 
-                // Proportional amount calculation with more precise math
+                // Proportional amount calculation
                 uint256 proportionalAmountA = (reserveA * liquidityToUse) /
                     totalLiquidity;
                 uint256 proportionalAmountB = (reserveB * liquidityToUse) /
@@ -335,7 +340,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
         return (totalAmountA, totalAmountB);
     }
 
-    // New function to calculate total user liquidity
+    // Calculate total user liquidity
     function _calculateTotalUserLiquidity(
         address user
     ) internal view returns (uint256 userTotalLiquidity) {
@@ -356,7 +361,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
         require(initialized, "Pool not initialized");
         require(amountIn > 0, "Invalid input amount");
 
-        // Fee calculation with more flexible tier system
+        // Fee calculation
         uint256 feePercentage = _calculateFeeTier();
         uint256 feeAmount = (amountIn * feePercentage) / 10000;
         uint256 amountInAfterFee = amountIn - feeAmount;

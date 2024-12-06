@@ -15,13 +15,13 @@ contract LPToken is ERC20, Ownable {
         pool = _pool;
     }
 
-    // Mint LP tokens (only callable by the pool contract)
+    // Mint LP tokens
     function mint(address to, uint256 amount) external {
         require(msg.sender == pool, "Only pool can mint");
         _mint(to, amount);
     }
 
-    // Burn LP tokens (only callable by the pool contract)
+    // Burn LP tokens
     function burn(address from, uint256 amount) external {
         require(msg.sender == pool, "Only pool can burn");
         _burn(from, amount);

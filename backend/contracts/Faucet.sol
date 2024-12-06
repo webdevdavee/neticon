@@ -33,7 +33,6 @@ contract TokenFaucet is Ownable {
         testToken.transfer(msg.sender, MAX_REQUEST_AMOUNT);
     }
 
-    // Owner can update the test token if needed
     function updateTestToken(ERC20 _newToken) external onlyOwner {
         testToken = _newToken;
     }

@@ -114,11 +114,9 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
         return (stakedAmount * REWARD_RATE * stakeDuration) / SECONDS_PER_DAY;
     }
 
-    // Allow owner to update reward rates or tokens if needed
-    function updateRewardConfiguration(
-        uint256 newRewardRate,
-        IERC20 newGovernanceToken
-    ) external onlyOwner {
-        // Implementation for updating reward parameters
-    }
+    // Update reward rates or tokens if needed
+    // function updateRewardConfiguration(
+    //     uint256 newRewardRate,
+    //     IERC20 newGovernanceToken
+    // ) external onlyOwner {}
 }
