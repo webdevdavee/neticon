@@ -171,45 +171,57 @@ contract AMMPool is ReentrancyGuard, Ownable {
         uint256 amountA,
         uint256 amountB
     ) external nonReentrant returns (uint256 liquidityMinted) {
-        // Validate initialization
-        require(initialized, "Pool not initialized");
-
-        // Validate input amounts
-        require(amountA > 0 && amountB > 0, "Amounts must be greater than 0");
-
-        // Validate price range
-        _validatePriceRange(amountA, amountB);
-
-        // Transfer tokens to the pool
-        require(
-            tokenA.transferFrom(msg.sender, address(this), amountA),
-            "TokenA transfer failed"
-        );
-        require(
-            tokenB.transferFrom(msg.sender, address(this), amountB),
-            "TokenB transfer failed"
-        );
-
-        // Track new metrics
-        if (!hasProvidedLiquidity[msg.sender]) {
-            hasProvidedLiquidity[msg.sender] = true;
-            activeUserCount++;
+        // Unchecked initialization and validation
+        unchecked {
+            require(initialized, "Pool not initialized");
+            require(
+                amountA > 0 && amountB > 0,
+                "Amounts must be greater than 0"
+            );
         }
 
-        // First liquidity deposit
+        // Price range validation (kept for safety)
+        _validatePriceRange(amountA, amountB);
+
+        // Consolidated token transfer with error handling
+        {
+            bool transferA = tokenA.transferFrom(
+                msg.sender,
+                address(this),
+                amountA
+            );
+            bool transferB = tokenB.transferFrom(
+                msg.sender,
+                address(this),
+                amountB
+            );
+            require(transferA && transferB, "Token transfer failed");
+        }
+
+        // Optimize active user tracking
+        if (!hasProvidedLiquidity[msg.sender]) {
+            unchecked {
+                hasProvidedLiquidity[msg.sender] = true;
+                activeUserCount++;
+            }
+        }
+
+        // Efficient first liquidity deposit handling
         if (totalLiquidity == 0) {
-            // Initial liquidity calculation
             liquidityMinted = _sqrt(amountA * amountB);
+
+            // Simplified minimum liquidity check
             require(
                 liquidityMinted > MINIMUM_LIQUIDITY,
                 "Insufficient initial liquidity"
             );
 
-            // Permanently lock minimum liquidity
-            totalLiquidity = MINIMUM_LIQUIDITY;
-            liquidityMinted -= MINIMUM_LIQUIDITY;
+            unchecked {
+                totalLiquidity = MINIMUM_LIQUIDITY;
+                liquidityMinted -= MINIMUM_LIQUIDITY;
+            }
         } else {
-            // Subsequent liquidity deposits
+            // Optimized liquidity calculation
             liquidityMinted = _calculateLiquidityMinted(
                 reserveA,
                 reserveB,
@@ -219,7 +231,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
             );
         }
 
-        // Liquidity position tracking
+        // Position tracking with memory optimization
         LiquidityPosition memory newPosition = LiquidityPosition({
             amountA: amountA,
             amountB: amountB,
@@ -229,17 +241,19 @@ contract AMMPool is ReentrancyGuard, Ownable {
             upperTick: upperTick
         });
 
+        // Append to storage more efficiently
         userPositions[msg.sender].push(newPosition);
 
-        // Update pool reserves
-        reserveA += amountA;
-        reserveB += amountB;
-        totalLiquidity += liquidityMinted;
+        // Batch update of pool reserves and metrics
+        unchecked {
+            reserveA += amountA;
+            reserveB += amountB;
+            totalLiquidity += liquidityMinted;
 
-        // Update Total Value Locked
-        uint256 depositValue = (amountA + amountB);
-        totalValueLocked += depositValue;
+            totalValueLocked += (amountA + amountB);
+        }
 
+        // Emit event
         emit LiquidityAdded(
             msg.sender,
             amountA,
@@ -249,7 +263,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
             upperTick
         );
 
-        // Mint LP tokens to the depositor
+        // LP token minting
         lpToken.mint(msg.sender, liquidityMinted);
 
         return liquidityMinted;
@@ -258,75 +272,72 @@ contract AMMPool is ReentrancyGuard, Ownable {
     function removeLiquidity(
         uint256 liquidityToRemove
     ) external nonReentrant returns (uint256 amountA, uint256 amountB) {
-        require(liquidityToRemove > 0, "Invalid liquidity amount");
-        require(initialized, "Pool not initialized");
+        require(liquidityToRemove > 0 && initialized, "Invalid input");
 
-        // Track total user liquidity
+        // Efficient total liquidity check
         uint256 totalUserLiquidity = _calculateTotalUserLiquidity(msg.sender);
         require(
             liquidityToRemove <= totalUserLiquidity,
-            "Cannot remove more liquidity than provided"
+            "Insufficient liquidity"
         );
 
-        // Position management
         LiquidityPosition[] storage positions = userPositions[msg.sender];
-        uint256 remainingToRemove = liquidityToRemove;
+
+        // Calculate proportional amounts more efficiently
         uint256 totalAmountA;
         uint256 totalAmountB;
+        uint256 remainingLiquidity = liquidityToRemove;
 
-        for (uint256 i = 0; i < positions.length; i++) {
-            if (remainingToRemove == 0) break;
-
+        for (uint256 i = 0; i < positions.length && remainingLiquidity > 0; ) {
             LiquidityPosition storage position = positions[i];
-            uint256 positionLiquidity = position.liquidityProvided;
 
-            if (positionLiquidity > 0) {
-                uint256 liquidityToUse = Math.min(
-                    positionLiquidity,
-                    remainingToRemove
-                );
+            if (position.liquidityProvided > 0) {
+                // Liquidity allocation
+                uint256 liquidityToUse = remainingLiquidity >
+                    position.liquidityProvided
+                    ? position.liquidityProvided
+                    : remainingLiquidity;
 
-                // Proportional amount calculation
-                uint256 proportionalAmountA = (reserveA * liquidityToUse) /
-                    totalLiquidity;
-                uint256 proportionalAmountB = (reserveB * liquidityToUse) /
-                    totalLiquidity;
+                unchecked {
+                    totalAmountA +=
+                        (reserveA * liquidityToUse) /
+                        totalLiquidity;
+                    totalAmountB +=
+                        (reserveB * liquidityToUse) /
+                        totalLiquidity;
 
-                totalAmountA += proportionalAmountA;
-                totalAmountB += proportionalAmountB;
+                    position.liquidityProvided -= liquidityToUse;
+                    remainingLiquidity -= liquidityToUse;
+                }
 
-                // Update position
-                position.liquidityProvided -= liquidityToUse;
-                remainingToRemove -= liquidityToUse;
-
-                // Remove position if fully liquidated
+                // Position removal
                 if (position.liquidityProvided == 0) {
                     positions[i] = positions[positions.length - 1];
                     positions.pop();
-                    i--;
+                } else {
+                    i++;
                 }
+            } else {
+                i++;
             }
         }
 
-        // Update pool reserves
-        reserveA -= totalAmountA;
-        reserveB -= totalAmountB;
-        totalLiquidity -= liquidityToRemove;
+        // Batch update of pool state
+        unchecked {
+            reserveA -= totalAmountA;
+            reserveB -= totalAmountB;
+            totalLiquidity -= liquidityToRemove;
+            totalValueLocked -= (totalAmountA + totalAmountB);
+        }
 
-        // Update Total Value Locked
-        uint256 withdrawalValue = totalAmountA + totalAmountB;
-        totalValueLocked -= withdrawalValue;
-
-        // Transfer tokens back to user
+        // Token transfers
         require(
-            tokenA.transfer(msg.sender, totalAmountA),
-            "TokenA transfer failed"
-        );
-        require(
-            tokenB.transfer(msg.sender, totalAmountB),
-            "TokenB transfer failed"
+            tokenA.transfer(msg.sender, totalAmountA) &&
+                tokenB.transfer(msg.sender, totalAmountB),
+            "Transfer failed"
         );
 
+        // Emit event
         emit LiquidityRemoved(
             msg.sender,
             totalAmountA,
@@ -334,7 +345,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
             liquidityToRemove
         );
 
-        // Burn LP tokens from the user
+        // Burn LP tokens
         lpToken.burn(msg.sender, liquidityToRemove);
 
         return (totalAmountA, totalAmountB);
