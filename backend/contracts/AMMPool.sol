@@ -283,7 +283,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
 
         LiquidityPosition[] storage positions = userPositions[msg.sender];
 
-        // Calculate proportional amounts more efficiently
+        // Calculate proportional amounts
         uint256 totalAmountA;
         uint256 totalAmountB;
         uint256 remainingLiquidity = liquidityToRemove;
