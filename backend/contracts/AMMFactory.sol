@@ -15,22 +15,26 @@ contract AMMFactory is Ownable {
         address indexed tokenB,
         address pool,
         uint256 lowerTick,
-        uint256 upperTick
+        uint256 upperTick,
+        uint256 initialLiquidityA,
+        uint256 initialLiquidityB,
+        uint256 liquidityMinted
     );
 
     constructor() Ownable(msg.sender) {
-        // Create an implementation contract that cannot be initialized
         poolImplementation = address(new AMMPool());
     }
 
-    function createPool(
+    function createPoolWithLiquidity(
         IERC20 tokenA,
         IERC20 tokenB,
         uint256 lowerTick,
         uint256 upperTick,
-        AMMPool.FeeTier feeTier
+        AMMPool.FeeTier feeTier,
+        uint256 amountA,
+        uint256 amountB
     ) external returns (address pool) {
-        // Prevent duplicate pools and ensure valid tokens
+        // Validation checks (same as before)
         require(
             address(tokenA) != address(0) &&
                 address(tokenB) != address(0) &&
@@ -38,14 +42,12 @@ contract AMMFactory is Ownable {
             "Invalid tokens"
         );
 
-        // Check if pool already exists. Check both directions to prevent duplicate pools
         require(
             getPools[address(tokenA)][address(tokenB)] == address(0) &&
                 getPools[address(tokenB)][address(tokenA)] == address(0),
             "Pool already exists"
         );
 
-        // Validate price range
         require(
             lowerTick > 0 &&
                 upperTick > lowerTick &&
@@ -53,11 +55,30 @@ contract AMMFactory is Ownable {
             "Invalid price range"
         );
 
-        // Use minimal proxy pattern for gas efficiency
+        // Validate initial liquidity amounts
+        require(amountA > 0 && amountB > 0, "Initial liquidity must be > 0");
+
+        // Clone pool implementation
         pool = Clones.clone(poolImplementation);
 
-        // Initialize the cloned pool
+        // Initialize the pool
         AMMPool(pool).initialize(tokenA, tokenB, lowerTick, upperTick, feeTier);
+
+        // Transfer tokens from msg.sender to the pool
+        require(
+            tokenA.transferFrom(msg.sender, pool, amountA),
+            "TokenA transfer failed"
+        );
+        require(
+            tokenB.transferFrom(msg.sender, pool, amountB),
+            "TokenB transfer failed"
+        );
+
+        // Add initial liquidity in the same transaction
+        uint256 liquidityMinted = AMMPool(pool).depositLiquidity(
+            amountA,
+            amountB
+        );
 
         // Record pool addresses bidirectionally
         getPools[address(tokenA)][address(tokenB)] = pool;
@@ -68,7 +89,12 @@ contract AMMFactory is Ownable {
             address(tokenB),
             pool,
             lowerTick,
-            upperTick
+            upperTick,
+            amountA,
+            amountB,
+            liquidityMinted
         );
+
+        return pool;
     }
 }
