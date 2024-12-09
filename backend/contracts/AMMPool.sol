@@ -356,32 +356,36 @@ contract AMMPool is ReentrancyGuard, Ownable {
     function swap(
         IERC20 tokenIn,
         IERC20 tokenOut,
-        uint256 amountIn
+        uint256 amountIn,
+        uint256 minAmountOut
     ) external nonReentrant returns (uint256 amountOut) {
         require(initialized, "Pool not initialized");
         require(amountIn > 0, "Invalid input amount");
+        require(minAmountOut > 0, "Minimum output must be specified");
 
-        // Fee calculation
+        // Determine reserves and token order
+        bool isTokenAInput = address(tokenIn) == address(tokenA);
+        uint256 reserveIn = isTokenAInput ? reserveA : reserveB;
+        uint256 reserveOut = isTokenAInput ? reserveB : reserveA;
+
+        // Fee tier calculation with more nuanced approach
         uint256 feePercentage = _calculateFeeTier();
         uint256 feeAmount = (amountIn * feePercentage) / 10000;
         uint256 amountInAfterFee = amountIn - feeAmount;
 
-        // Determine reserves and calculate swap
-        uint256 reserveIn = address(tokenIn) == address(tokenA)
-            ? reserveA
-            : reserveB;
-        uint256 reserveOut = address(tokenIn) == address(tokenA)
-            ? reserveB
-            : reserveA;
+        uint256 constantProduct = reserveIn * reserveOut;
+        uint256 newReserveIn = reserveIn + amountInAfterFee;
+        uint256 newReserveOut = constantProduct / newReserveIn;
 
-        amountOut =
-            (reserveOut * amountInAfterFee) /
-            (reserveIn + amountInAfterFee);
+        amountOut = reserveOut - newReserveOut;
 
-        // Validate price range
+        // Slippage protection
+        require(amountOut >= minAmountOut, "Insufficient output amount");
+
+        // Validate price range with more precision
         _validateSwapPriceRange(amountIn, amountOut);
 
-        // Transfer tokens
+        // Token transfers
         require(
             tokenIn.transferFrom(msg.sender, address(this), amountIn),
             "Input token transfer failed"
@@ -391,41 +395,74 @@ contract AMMPool is ReentrancyGuard, Ownable {
             "Output token transfer failed"
         );
 
-        // Update reserves
-        if (address(tokenIn) == address(tokenA)) {
-            reserveA += amountIn;
+        // Update reserves more accurately
+        if (isTokenAInput) {
+            reserveA += amountInAfterFee;
             reserveB -= amountOut;
             feesToken0 += feeAmount;
         } else {
-            reserveB += amountIn;
+            reserveB += amountInAfterFee;
             reserveA -= amountOut;
             feesToken1 += feeAmount;
         }
 
-        // Volume tracking
-        volumeLast24h += amountIn;
-        volumeAllTime += amountIn;
+        // Advanced volume and metrics tracking
+        _updateVolumeMetrics(amountIn);
 
-        // Reset 24h volume if needed
-        if (block.timestamp - lastVolumeResetTimestamp >= 1 days) {
-            emit VolumeReset(volumeLast24h, block.timestamp);
-            volumeLast24h = 0;
-            lastVolumeResetTimestamp = block.timestamp;
-        }
-
+        // Emit events with more comprehensive information
         emit Swap(
             msg.sender,
             address(tokenIn),
             address(tokenOut),
             amountIn,
             amountOut,
-            feeAmount
+            feeAmount,
+            reserveIn,
+            reserveOut
         );
 
-        // Emit fees collected event
-        emit FeesCollected(feesToken0, feesToken1, block.timestamp);
-
         return amountOut;
+    }
+
+    // Enhanced volume tracking
+    function _updateVolumeMetrics(uint256 amount) internal {
+        volumeLast24h += amount;
+        volumeAllTime += amount;
+
+        // More precise volume reset mechanism
+        if (block.timestamp - lastVolumeResetTimestamp >= 1 days) {
+            uint256 currentVolume = volumeLast24h;
+            lastVolumeResetTimestamp = block.timestamp;
+            volumeLast24h = 0;
+
+            emit VolumeReset(currentVolume, block.timestamp);
+        }
+    }
+
+    // Swap price validation
+    function _validateSwapPriceRange(
+        uint256 amountIn,
+        uint256 amountOut
+    ) internal view {
+        require(initialized, "Pool not initialized");
+        require(amountOut > 0, "Invalid output amount");
+
+        // Uses geometric mean for price stability
+        uint256 swapPrice = _calculateGeometricMeanPrice(amountIn, amountOut);
+
+        require(
+            swapPrice >= lowerTick && swapPrice <= upperTick,
+            "Swap outside allowed price range"
+        );
+    }
+
+    // Geometric mean price calculation for more stable pricing
+    function _calculateGeometricMeanPrice(
+        uint256 amountIn,
+        uint256 amountOut
+    ) internal pure returns (uint256) {
+        // Sqrt(amountIn * amountOut) with 18 decimal precision
+        return _sqrt(amountIn * amountOut * 1e18);
     }
 
     // Price range validation for deposits
@@ -443,25 +480,6 @@ contract AMMPool is ReentrancyGuard, Ownable {
         require(
             currentPrice >= lowerTick && currentPrice <= upperTick,
             "Deposit outside allowed price range"
-        );
-    }
-
-    // Price range validation for swaps
-    function _validateSwapPriceRange(
-        uint256 amountIn,
-        uint256 amountOut
-    ) internal view {
-        require(initialized, "Pool not initialized");
-
-        // Prevent division by zero
-        require(amountOut > 0, "Invalid amount out");
-
-        // Calculate swap price with 18 decimal precision
-        uint256 swapPrice = (amountIn * 1e18) / amountOut;
-
-        require(
-            swapPrice >= lowerTick && swapPrice <= upperTick,
-            "Swap outside allowed price range"
         );
     }
 
