@@ -184,19 +184,17 @@ contract AMMPool is ReentrancyGuard, Ownable {
         _validatePriceRange(amountA, amountB);
 
         // Consolidated token transfer with error handling
-        {
-            bool transferA = tokenA.transferFrom(
-                msg.sender,
-                address(this),
-                amountA
-            );
-            bool transferB = tokenB.transferFrom(
-                msg.sender,
-                address(this),
-                amountB
-            );
-            require(transferA && transferB, "Token transfer failed");
-        }
+        bool transferA = tokenA.transferFrom(
+            msg.sender,
+            address(this),
+            amountA
+        );
+        bool transferB = tokenB.transferFrom(
+            msg.sender,
+            address(this),
+            amountB
+        );
+        require(transferA && transferB, "Token transfer failed");
 
         // Optimize active user tracking
         if (!hasProvidedLiquidity[msg.sender]) {

@@ -139,7 +139,7 @@ contract LiquidityMining is Ownable2Step, ReentrancyGuard {
         emit TokensStaked(msg.sender, amount, block.timestamp);
     }
 
-    // Unstake tokens from the liquidity pool
+    // Unstake tokens
     function unstakeTokens(uint256 amount) external nonReentrant {
         UserStake storage user = userStakes[msg.sender];
         require(user.stakedAmount >= amount, "Insufficient stake");
