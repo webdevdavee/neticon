@@ -12,6 +12,7 @@ import {
   FaExchangeAlt,
   FaTimes,
 } from "react-icons/fa";
+import { AiOutlineDollarCircle } from "react-icons/ai";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { formatCurrency, calculatePoolShare } from "@/libs/utils";
@@ -28,7 +29,7 @@ const mockLiquidityPools: LiquidityPool[] = [
     totalValueLocked: 1245678.89,
     apr: 12.45,
     volume24h: 345678.23,
-    myLiquidity: 5678.9,
+    fees24h: 12739,
     tokens: {
       token1: { symbol: "ETH", amount: 25.67 },
       token2: { symbol: "USDC", amount: 45678.9 },
@@ -40,7 +41,7 @@ const mockLiquidityPools: LiquidityPool[] = [
     totalValueLocked: 987654.56,
     apr: 8.75,
     volume24h: 234567.12,
-    myLiquidity: 3456.78,
+    fees24h: 6536,
     tokens: {
       token1: { symbol: "USDT", amount: 45678.9 },
       token2: { symbol: "DAI", amount: 45678.9 },
@@ -145,7 +146,7 @@ const LiquidityPools: React.FC = () => {
                     "Total Value Locked",
                     "APR",
                     "24h Volume",
-                    "My Liquidity",
+                    "24h Fees",
                     "Tokens",
                   ].map((header) => (
                     <th
@@ -208,9 +209,9 @@ const LiquidityPools: React.FC = () => {
                       </div>
                     </td>
 
-                    {/* My Liquidity Column */}
-                    <td className="px-6 py-4 text-sm text-zinc-400">
-                      {formatCurrency(pool.myLiquidity)}
+                    {/* 24h Fees Column */}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-zinc-300">
+                      {formatCurrency(pool.fees24h)}
                     </td>
 
                     {/* Tokens Column */}
@@ -347,13 +348,11 @@ const LiquidityPools: React.FC = () => {
                     Pair: {getSelectedPoolDetails()?.pair}
                   </p>
                   <p className="text-zinc-500">
-                    <FaPercentage className="inline mr-2" />
-                    Current APR: {getSelectedPoolDetails()?.apr}%
-                  </p>
-                  <p className="text-zinc-500">
-                    <FaWater className="inline mr-2" />
-                    My Current Liquidity:{" "}
-                    {formatCurrency(getSelectedPoolDetails()?.myLiquidity || 0)}
+                    <AiOutlineDollarCircle className="inline mr-2" />
+                    24h Fees:{" "}
+                    {formatCurrency(
+                      getSelectedPoolDetails()?.fees24h as number
+                    )}
                   </p>
                 </div>
               </div>

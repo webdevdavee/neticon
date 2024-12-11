@@ -27,7 +27,10 @@ contract AMMPool is ReentrancyGuard, Ownable {
     IERC20 public tokenA;
     IERC20 public tokenB;
     address public factory;
+
     FeeTier public feeTier;
+    uint256 public feesLast24h;
+    uint256 public lastFeesResetTimestamp;
 
     // Enhanced Pool Metrics
     uint256 public totalValueLocked;
@@ -85,6 +88,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
         uint256 feesToken1,
         uint256 timestamp
     );
+    event FeesReset(uint256 feesAmount, uint256 timestamp);
 
     event Swap(
         address indexed sender,
@@ -382,6 +386,9 @@ contract AMMPool is ReentrancyGuard, Ownable {
         uint256 feeAmount = (amountIn * feePercentage) / 10000;
         uint256 amountInAfterFee = amountIn - feeAmount;
 
+        // Track fees
+        _updateFeeMetrics(feeAmount);
+
         uint256 constantProduct = reserveIn * reserveOut;
         uint256 newReserveIn = reserveIn + amountInAfterFee;
         uint256 newReserveOut = constantProduct / newReserveIn;
@@ -433,12 +440,27 @@ contract AMMPool is ReentrancyGuard, Ownable {
         return amountOut;
     }
 
+    // Track fees
+    function _updateFeeMetrics(uint256 feeAmount) internal {
+        // Update 24-hour fees
+        feesLast24h += feeAmount;
+
+        // Fee reset mechanism
+        if (block.timestamp - lastFeesResetTimestamp >= 1 days) {
+            uint256 currentFees = feesLast24h;
+            lastFeesResetTimestamp = block.timestamp;
+            feesLast24h = 0;
+
+            emit FeesReset(currentFees, block.timestamp);
+        }
+    }
+
     // Enhanced volume tracking
     function _updateVolumeMetrics(uint256 amount) internal {
         volumeLast24h += amount;
         volumeAllTime += amount;
 
-        // More precise volume reset mechanism
+        // Volume reset mechanism
         if (block.timestamp - lastVolumeResetTimestamp >= 1 days) {
             uint256 currentVolume = volumeLast24h;
             lastVolumeResetTimestamp = block.timestamp;
@@ -516,15 +538,26 @@ contract AMMPool is ReentrancyGuard, Ownable {
             uint256 _feesToken0,
             uint256 _feesToken1,
             uint256 _apr
+            uint256 _feesLast24h,
+            string memory _pairSymbol
         )
     {
-        // Prorated APR calculation
+        // APR calculation
         uint256 feesGenerated = feesToken0 + feesToken1;
         uint256 timeSinceLastReset = block.timestamp - lastVolumeResetTimestamp;
         uint256 apr = totalValueLocked > 0
             ? (feesGenerated * (365 days / timeSinceLastReset) * 100) /
-                totalValueLocked
+                totalValueLocked 
             : 0;
+    
+        // Create pair symbol 
+        string memory pairSymbol = string(
+            abi.encodePacked(
+                ERC20(address(tokenA)).symbol(),
+                "/",
+                ERC20(address(tokenB)).symbol()
+            )
+        );
 
         return (
             totalValueLocked,
@@ -535,7 +568,9 @@ contract AMMPool is ReentrancyGuard, Ownable {
             reserveB,
             feesToken0,
             feesToken1,
-            apr
+            apr,
+            feesLast24h,
+            pairSymbol
         );
     }
 

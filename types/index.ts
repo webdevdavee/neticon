@@ -23,7 +23,7 @@ export interface LiquidityPool {
   totalValueLocked: number;
   apr: number;
   volume24h: number;
-  myLiquidity: number;
+  fees24h: number;
   tokens: {
     token1: Token;
     token2: Token;
