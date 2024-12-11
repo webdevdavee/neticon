@@ -8,7 +8,15 @@ import "./AMMPool.sol";
 
 contract AMMFactory is Ownable {
     address public immutable poolImplementation;
+
+    // Track pools
     mapping(address => mapping(address => address)) public getPools;
+
+    // Store all created pool addresses
+    address[] public allPools;
+
+    // Check if an address is a valid pool
+    mapping(address => bool) public isPool;
 
     event PoolCreated(
         address indexed tokenA,
@@ -83,6 +91,10 @@ contract AMMFactory is Ownable {
         getPools[address(tokenA)][address(tokenB)] = pool;
         getPools[address(tokenB)][address(tokenA)] = pool;
 
+        // Track all pools
+        allPools.push(pool);
+        isPool[pool] = true;
+
         emit PoolCreated(
             address(tokenA),
             address(tokenB),
@@ -95,5 +107,18 @@ contract AMMFactory is Ownable {
         );
 
         return pool;
+    }
+
+    // Retrieve pools
+    function getAllPools() external view returns (address[] memory) {
+        return allPools;
+    }
+
+    // Get pools for specific tokens
+    function getPoolForTokenPair(
+        address tokenA,
+        address tokenB
+    ) external view returns (address) {
+        return getPools[tokenA][tokenB];
     }
 }

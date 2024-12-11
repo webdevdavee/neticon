@@ -45,7 +45,7 @@ contract LiquidityMining is Ownable, ReentrancyGuard {
     }
     mapping(address => StakingInterval[]) public userStakingHistory;
 
-    // Event notifications
+    // Event
     event TokensStaked(address indexed user, uint256 amount, uint256 timestamp);
     event TokensUnstaked(
         address indexed user,
