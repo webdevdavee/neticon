@@ -34,7 +34,6 @@ contract AMMFactory is Ownable {
         uint256 amountA,
         uint256 amountB
     ) external returns (address pool) {
-        // Validation checks (same as before)
         require(
             address(tokenA) != address(0) &&
                 address(tokenB) != address(0) &&

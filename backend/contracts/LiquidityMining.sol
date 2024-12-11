@@ -2,11 +2,11 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./GovernanceToken.sol";
 
-contract LiquidityMining is Ownable2Step, ReentrancyGuard {
+contract LiquidityMining is Ownable, ReentrancyGuard {
     // User's staking information with more descriptive names
     struct UserStake {
         uint256 stakedAmount; // Amount of tokens the user has staked
@@ -59,7 +59,7 @@ contract LiquidityMining is Ownable2Step, ReentrancyGuard {
         IERC20 _liquidityPoolToken,
         GovernanceToken _rewardToken,
         uint256 _initialRewardPerBlock
-    ) {
+    ) Ownable(msg.sender) {
         require(
             address(_liquidityPoolToken) != address(0),
             "Invalid Liquidity Pool Token"

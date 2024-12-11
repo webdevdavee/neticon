@@ -537,7 +537,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
             uint256 _reserveB,
             uint256 _feesToken0,
             uint256 _feesToken1,
-            uint256 _apr
+            uint256 _apr,
             uint256 _feesLast24h,
             string memory _pairSymbol
         )
@@ -547,10 +547,10 @@ contract AMMPool is ReentrancyGuard, Ownable {
         uint256 timeSinceLastReset = block.timestamp - lastVolumeResetTimestamp;
         uint256 apr = totalValueLocked > 0
             ? (feesGenerated * (365 days / timeSinceLastReset) * 100) /
-                totalValueLocked 
+                totalValueLocked
             : 0;
-    
-        // Create pair symbol 
+
+        // Create pair symbol
         string memory pairSymbol = string(
             abi.encodePacked(
                 ERC20(address(tokenA)).symbol(),

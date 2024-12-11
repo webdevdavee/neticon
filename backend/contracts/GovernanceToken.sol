@@ -2,11 +2,11 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
-import "@openzeppelin/contracts/access/Ownable2Step.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-contract GovernanceToken is ERC20Permit, Ownable2Step, ReentrancyGuard {
+contract GovernanceToken is ERC20Permit, Ownable, ReentrancyGuard {
     uint256 public constant MAX_SUPPLY = 1_000_000_000 * 10 ** 18; // 1 billion tokens
 
     struct TokenReserve {
@@ -29,7 +29,11 @@ contract GovernanceToken is ERC20Permit, Ownable2Step, ReentrancyGuard {
         uint256 amount
     );
 
-    constructor() ERC20Permit("Neticon") ERC20("Neticon", "NETI") {
+    constructor()
+        ERC20Permit("Neticon")
+        ERC20("Neticon", "NETI")
+        Ownable(msg.sender)
+    {
         // 70% allocated to rewards, 30% to team
         reserves["rewards"] = TokenReserve({
             total: (MAX_SUPPLY * 70) / 100,
