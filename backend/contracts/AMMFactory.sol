@@ -5,9 +5,11 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/proxy/Clones.sol";
 import "./AMMPool.sol";
+import "./LPTokenFactory.sol";
 
 contract AMMFactory is Ownable {
     address public immutable poolImplementation;
+    LPTokenFactory public lpTokenFactory;
 
     // Track pools
     mapping(address => mapping(address => address)) public getPools;
@@ -69,7 +71,14 @@ contract AMMFactory is Ownable {
         pool = Clones.clone(poolImplementation);
 
         // Initialize the pool
-        AMMPool(pool).initialize(tokenA, tokenB, lowerTick, upperTick, feeTier);
+        AMMPool(pool).initialize(
+            tokenA,
+            tokenB,
+            lowerTick,
+            upperTick,
+            feeTier,
+            lpTokenFactory
+        );
 
         // Transfer tokens from msg.sender to the pool
         require(

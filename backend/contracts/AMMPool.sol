@@ -6,6 +6,7 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "./LPToken.sol";
+import "./LPTokenFactory.sol";
 
 contract AMMPool is ReentrancyGuard, Ownable {
     using Math for uint256;
@@ -22,6 +23,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
 
     // LP Token for this pool
     LPToken public lpToken;
+    LPTokenFactory public lpTokenFactory;
 
     // Pool config
     IERC20 public tokenA;
@@ -96,7 +98,9 @@ contract AMMPool is ReentrancyGuard, Ownable {
         address indexed tokenOut,
         uint256 amountIn,
         uint256 amountOut,
-        uint256 feeAmount
+        uint256 feeAmount,
+        uint256 reserveIn,
+        uint256 reserveOut
     );
 
     event VolumeReset(uint256 volumeLast24h, uint256 timestamp);
@@ -111,7 +115,7 @@ contract AMMPool is ReentrancyGuard, Ownable {
 
     constructor() Ownable(msg.sender) {
         // Prevent direct initialization of this contract
-        initialized = true;
+        initialized = false;
     }
 
     // Initialization function for clone factories
@@ -120,35 +124,32 @@ contract AMMPool is ReentrancyGuard, Ownable {
         IERC20 _tokenB,
         uint256 _lowerTick,
         uint256 _upperTick,
-        FeeTier _feeTier
+        FeeTier _feeTier,
+        LPTokenFactory _lpTokenFactory
     ) external {
         // Prevent re-initialization and direct calls
         require(!initialized, "Pool already initialized");
         require(_lowerTick < _upperTick, "Invalid price range");
+        require(
+            address(_lpTokenFactory) != address(0),
+            "Invalid LPTokenFactory"
+        );
 
-        // Set initialization flagsoli
+        // Set initialization
         initialized = true;
 
-        // Create LP Token for this pool
-        lpToken = new LPToken(
-            string(
-                abi.encodePacked(
-                    "LP-",
-                    ERC20(address(_tokenA)).symbol(),
-                    "-",
-                    ERC20(address(_tokenB)).symbol()
-                )
-            ),
-            string(
-                abi.encodePacked(
-                    "LP_",
-                    ERC20(address(_tokenA)).symbol(),
-                    "_",
-                    ERC20(address(_tokenB)).symbol()
-                )
-            ),
-            address(this)
+        // Initialize lptokenFactory
+        lpTokenFactory = _lpTokenFactory;
+
+        // Create LP Token through factory
+        address lpTokenAddress = lpTokenFactory.createLPToken(
+            address(this),
+            address(_tokenA),
+            address(_tokenB)
         );
+
+        // Create LP Token for this pool
+        lpToken = LPToken(lpTokenAddress);
 
         // Configure pool tokens and parameters
         tokenA = _tokenA;
@@ -267,6 +268,9 @@ contract AMMPool is ReentrancyGuard, Ownable {
 
         // LP token minting
         lpToken.mint(msg.sender, liquidityMinted);
+
+        // Register LP token with the LPTokenFactory
+        lpTokenFactory.registerLPToken(address(lpToken), msg.sender);
 
         return liquidityMinted;
     }
@@ -425,7 +429,6 @@ contract AMMPool is ReentrancyGuard, Ownable {
         // Advanced volume and metrics tracking
         _updateVolumeMetrics(amountIn);
 
-        // Emit events with more comprehensive information
         emit Swap(
             msg.sender,
             address(tokenIn),
